@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv("result/perfomance.csv")
 
-X_VAR = "N"
+X_VAR = "k"
 Y_VAR = "time"
 
 

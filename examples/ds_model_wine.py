@@ -9,9 +9,9 @@ from torch.nn import CrossEntropyLoss, MSELoss
 from ds.DSModel import DSModel
 
 data = pd.read_csv("data/wine.csv")
-data = pd.concat([data[data["color"] == "red"].sample(n=1200),
-                  data[data["color"] == "white"].sample(n=1200)])\
-        .reset_index(drop=True)
+# data = pd.concat([data[data["color"] == "red"].sample(n=1200),
+#                   data[data["color"] == "white"].sample(n=1200)])\
+#         .reset_index(drop=True)
 
 
 data["color"] = data["color"].map({"red": 0, "white": 1})
@@ -27,14 +27,15 @@ X_test = data.iloc[cut:, :-1].as_matrix()
 y_test = data.iloc[cut:, -1].as_matrix()
 
 model = DSModel()
-model.generate_statistic_rules(X_train, breaks=4)
+model.generate_statistic_single_rules(X_train, breaks=2)
+# model.generate_mult_pair_rules(X_train)
 
-optimizer = torch.optim.Adam(model.masses, lr=.01)
+optimizer = torch.optim.Adam(model.masses, lr=.05)
 criterion = CrossEntropyLoss()
 
 losses = []
 
-print model
+# print model
 
 ti = time.time()
 model.train()
@@ -44,7 +45,7 @@ yt = Variable(torch.Tensor(y_train).long())
 # yt = torch.Tensor(y_train).view(len(y_train), 1)
 # yt = Variable(torch.cat([yt == 0, yt == 1], 1).float())
 
-for epoch in range(1000):
+for epoch in range(10):
     print "Processing epoch %d" % (epoch + 1)
     y_pred = model.forward(Xt)
     loss = criterion(y_pred, yt)
@@ -59,10 +60,11 @@ for epoch in range(1000):
 print "Training time: %.2fs, epochs: %d" % (time.time() - ti, epoch)
 print "Least training loss reached: %.3f" % losses[-1]
 model.eval()
-print model
+# print model
 
 # TESTING
 with torch.no_grad():
+    print model.find_most_important_rules()
     Xt = torch.Tensor(X_test)
     Yt = torch.Tensor(y_test).long().numpy()
     _, yt_pred = torch.max(model(Xt), 1)

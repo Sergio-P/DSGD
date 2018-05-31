@@ -7,10 +7,10 @@ from torch.nn import CrossEntropyLoss, MSELoss
 from ds.DSModel import DSModel
 
 data = pd.read_csv("data/iris.csv")
-data = data[data.species != "versicolor"].reset_index(drop=True)  # Remove virginica to make the problem binary
+data = data[data.species != "setosa"].reset_index(drop=True)  # Remove virginica to make the problem binary
 data = data.sample(frac=1).reset_index(drop=True)
 
-data = data.replace("setosa", 0).replace("virginica", 1)
+data = data.replace("versicolor", 0).replace("virginica", 1)
 
 data = data.apply(pd.to_numeric)
 cut = int(0.7*len(data))
@@ -21,7 +21,8 @@ X_test = data.iloc[cut:, :-1].as_matrix()
 y_test = data.iloc[cut:, -1].as_matrix()
 
 model = DSModel()
-model.generate_statistic_rules(X_train)
+model.generate_statistic_single_rules(X_train, breaks=4)
+model.generate_mult_pair_rules(X_train)
 # print model
 # exit()
 
