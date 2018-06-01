@@ -1,5 +1,7 @@
 import time
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import torch
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -28,7 +30,7 @@ y_test = data.iloc[cut:, -1].as_matrix()
 
 model = DSModel()
 model.generate_statistic_single_rules(X_train, breaks=2)
-# model.generate_mult_pair_rules(X_train)
+model.generate_mult_pair_rules(X_train)
 
 optimizer = torch.optim.Adam(model.masses, lr=.05)
 criterion = CrossEntropyLoss()
@@ -77,7 +79,7 @@ with torch.no_grad():
 
 plt.plot(range(len(losses)), losses)
 plt.xlabel("Iterations")
-plt.ylabel("MSE")
+plt.ylabel("CE")
 # plt.axis([0, len(losses) - 1, losses[-1] - 0.05, losses[0] + 0.02])
 plt.title("Error")
-plt.show()
+plt.savefig("wine_error.png")
