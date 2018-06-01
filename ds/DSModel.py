@@ -1,4 +1,6 @@
 import torch
+import dill
+import pickle
 from torch import nn
 from torch.autograd import Variable
 import numpy as np
@@ -84,7 +86,7 @@ class DSModel(nn.Module):
             builder += "\nRule %d: %s\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % (i+1, ps, ms[0], ms[1], ms[2])
         return builder[:-1]
 
-    def find_most_important_rules(self, classes=None, threshold=0.2):
+    def find_most_important_rules(self, classes=None, threshold=0.2, class_names=None):
         """
         Shows the most contributive rules for the classes specified
         :param classes: Array of classes, by default shows all clases
@@ -94,53 +96,97 @@ class DSModel(nn.Module):
         builder = "Most important rules\n"
         if classes is None:
             classes = [0, 1]
+
+        if class_names is None:
+            class_names = ["%d" for i in range(1)]
+
         for cls in classes:
-            builder += " For class %d\n" % cls
-            found = False
+            builder += "\n For class %s\n" % class_names[cls]
+            found = []
             for i in range(len(self.masses)):
                 ms = self.masses[i]
                 score = ((.1 + ms[cls]) / (.1 + ms[1 - cls]) - 1) * (1 - ms[-1]) / 10.
                 if score >= threshold * threshold:
-                    found = True
                     ps = str(self.preds[i])
-                    builder += "  Rule %d: %s\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % (i + 1, ps, ms[0], ms[1], ms[2])
-            if not found:
+                    found.append((score, "  Rule %d: %s (%.3f)\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % \
+                                (i + 1, ps, np.sqrt(score.detach().numpy()), ms[0], ms[1], ms[2])))
+
+            found.sort(reverse=True)
+            if len(found) == 0:
                 builder += "   No rules found\n"
+
+            for rule in found:
+                builder += rule[1]
+
         return builder[:-1]
 
-    def generate_statistic_single_rules(self, X, breaks=2):
+    def generate_statistic_single_rules(self, X, breaks=2, column_names=None):
         """
         Populates the model with attribute-independant rules based on statistical breaks.
         In total this method generates No. attributes * (breaks + 1) rules
         :param X: Set of inputs (can be the same as training or a sample)
         :param breaks: Number of breaks per attribute
+        :param column_names: Column attribute names
         """
         mean = np.nanmean(X, axis=0)
         std = np.nanstd(X, axis=0)
         brks = norm.ppf(np.linspace(0,1,breaks+2))[1:-1]
+
+        if column_names is None:
+            column_names = ["X[%d]" for i in range(len(mean))]
+
         for i in range(len(mean)):
             # First rule
             v = mean[i] + std[i] * brks[0]
-            self.add_rule(DSRule(lambda x, i=i: x[i] <= v, "X[%d] < %.3f" % (i, v)))
+            self.add_rule(DSRule(lambda x, i=i: x[i] <= v, "%s < %.3f" % (column_names[i], v)))
             # Mid rules
             for j in range(1, len(brks)):
                 vl = v
                 v = mean[i] + std[i] * brks[j]
-                self.add_rule(DSRule(lambda x, i=i: vl <= x[i] < v, "%.3f < X[%d] < %.3f" % (vl, i, v)))
+                self.add_rule(DSRule(lambda x, i=i: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, column_names[i], v)))
             # Last rule
-            self.add_rule(DSRule(lambda x, i=i: x[i] > v, "X[%d] > %.3f" % (i, v)))
+            self.add_rule(DSRule(lambda x, i=i: x[i] > v, "%s > %.3f" % (column_names[i], v)))
 
-    def generate_mult_pair_rules(self, X):
+    def generate_mult_pair_rules(self, X, column_names=None, include_square=False):
         """
         Populates the model with with rules combining 2 attributes by their multipication, adding both positive
         and negative rule. In total this method generates (No. attributes)^2 rules
         :param X: Set of inputs (can be the same as training or a sample)
+        :param column_names: Column attribute names
+        :param include_square: Includes rules comparing the same attribute (ie x[i] * x[i])
         """
         mean = np.nanmean(X, axis=0)
+
+        if column_names is None:
+            column_names = ["X[%d]" for i in range(len(mean))]
+
+        offset = 0 if include_square else 1
+
         for i in range(len(mean)):
-            for j in range(i+1,len(mean)):
+            for j in range(i + offset, len(mean)):
                 mk = mean[i] * mean[j]
                 self.add_rule(DSRule(lambda x, i=i, j=j: (x[i] - mean[i]) * (x[j] - mean[j]) > 0,
-                                     "Positive centered X[%d] X[%d]" % (i,j)))
+                                     "Positive centered %s, %s" % (column_names[i],column_names[i])))
                 self.add_rule(DSRule(lambda x, i=i, j=j: (x[i] - mean[i]) * (x[j] - mean[j]) <= 0,
-                                     "Negative centered X[%d] X[%d]" % (i,j)))
+                                     "Negative centered %s, %s" % (column_names[i],column_names[i])))
+
+    def load_rules_bin(self, filename):
+        """
+        Loads rules from a file, it deletes previous rules
+        :param filename: The name of the input file
+        """
+        with open(filename) as f:
+            sv = pickle.load(f)
+            self.preds = sv["preds"]
+            self.masses = sv["masses"]
+
+        print self.preds
+
+    def save_rules_bin(self, filename):
+        """
+        Saves the current rules into a file
+        :param filename: The name of the file
+        """
+        with open(filename, "w") as f:
+            sv = {"preds": self.preds, "masses": self.masses}
+            pickle.dump(sv, f, pickle.HIGHEST_PROTOCOL)

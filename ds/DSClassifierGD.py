@@ -30,7 +30,7 @@ class DSClassifier(ClassifierMixin):
         self.debug_mode = debug_mode
         self.model = DSModel()
 
-    def fit(self, X, y, add_single_rules=False, single_rules_breaks=2, add_mult_rules=False, **kwargs):
+    def fit(self, X, y, add_single_rules=False, single_rules_breaks=2, add_mult_rules=False, column_names=None, **kwargs):
         """
         Fits the model masses using gradient descent optimization
         :param X: Features for training
@@ -41,9 +41,9 @@ class DSClassifier(ClassifierMixin):
         :param kwargs: In case of debugging, parameters of optimize_debug
         """
         if add_single_rules:
-            self.model.generate_statistic_single_rules(X, breaks=single_rules_breaks)
+            self.model.generate_statistic_single_rules(X, breaks=single_rules_breaks, column_names=column_names)
         if add_mult_rules:
-            self.model.generate_mult_pair_rules(X)
+            self.model.generate_mult_pair_rules(X, column_names=column_names)
 
         if self.optim == "adam":
             optimizer = torch.optim.Adam(self.model.masses, lr=self.lr)
@@ -75,6 +75,7 @@ class DSClassifier(ClassifierMixin):
             yt = torch.Tensor(y).view(len(y), 1)
             yt = Variable(torch.cat([yt == 0, yt == 1], 1).float())
 
+        epoch = 0
         for epoch in range(self.max_iter):
             y_pred = self.model.forward(Xt)
             loss = criterion(y_pred, yt)
@@ -86,6 +87,8 @@ class DSClassifier(ClassifierMixin):
             losses.append(loss.data.item())
             if epoch > 2 and abs(losses[-2] - loss.data.item()) < self.min_dJ:
                 break
+
+        return losses, epoch
 
     def _optimize_debug(self, X, y, optimizer, criterion, print_init_model=False, print_final_model=False, print_time=True,
                        print_partial_time=False, print_every_epochs=None, print_least_loss=True, return_partial_dt=False):
