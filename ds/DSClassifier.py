@@ -1,15 +1,13 @@
-import pandas as pd
-import numpy as np
 import json
-
 import pickle
 
+import pandas as pd
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 
 from core import create_full_uncertainty, cls_max, dempster_rule, cls_score, cls_pla_score, cls_pla_max
-from utils import statistic_breaks, is_categorical
+from ds.utils import statistic_breaks, is_categorical
 
 
 class DSClassifier(ClassifierMixin):

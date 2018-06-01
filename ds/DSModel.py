@@ -99,9 +99,8 @@ class DSModel(nn.Module):
             found = False
             for i in range(len(self.masses)):
                 ms = self.masses[i]
-                s = ((.1 + ms[cls]) / (.1 + ms[1 - cls]) - 1) * (1 - ms[-1]) / 10.
-                score = np.sign(s) * np.sqrt(np.abs(s))
-                if score >= threshold:
+                score = ((.1 + ms[cls]) / (.1 + ms[1 - cls]) - 1) * (1 - ms[-1]) / 10.
+                if score >= threshold * threshold:
                     found = True
                     ps = str(self.preds[i])
                     builder += "  Rule %d: %s\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % (i + 1, ps, ms[0], ms[1], ms[2])
@@ -141,5 +140,7 @@ class DSModel(nn.Module):
         for i in range(len(mean)):
             for j in range(i+1,len(mean)):
                 mk = mean[i] * mean[j]
-                self.add_rule(DSRule(lambda x, i=i, j=j: x[i] * x[j] > mk,  "X[%d]*X[%d] > %.3f" % (i,j,mk)))
-                self.add_rule(DSRule(lambda x, i=i, j=j: x[i] * x[j] <= mk, "X[%d]*X[%d] < %.3f" % (i,j,mk)))
+                self.add_rule(DSRule(lambda x, i=i, j=j: (x[i] - mean[i]) * (x[j] - mean[j]) > 0,
+                                     "Positive centered X[%d] X[%d]" % (i,j)))
+                self.add_rule(DSRule(lambda x, i=i, j=j: (x[i] - mean[i]) * (x[j] - mean[j]) <= 0,
+                                     "Negative centered X[%d] X[%d]" % (i,j)))
