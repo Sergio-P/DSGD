@@ -1,14 +1,27 @@
 # coding=utf-8
 import time
 import torch
+from sklearn.base import ClassifierMixin
 from torch.autograd import Variable
 
 from ds.DSModel import DSModel
 
 
-class DSClassifier():
+class DSClassifier(ClassifierMixin):
+    """
+    Implementation of Classifier based on DSModel
+    """
 
     def __init__(self, lr=0.01, max_iter=200, min_dloss=0.001, optim="adam", lossfn="CE", debug_mode=False):
+        """
+        Creates the classifier and the DSModel (accesible in attribute model)
+        :param lr: Learning rate
+        :param max_iter: Maximun number of epochs in training
+        :param min_dloss: Minium variation of loss to consider converged
+        :param optim: [ adam | sgd ] Optimization Method
+        :param lossfn: [ CE | MSE ] Loss function
+        :param debug_mode: Enables debug in training (prtinting and output metrics)
+        """
         self.lr = lr
         self.optim = optim
         self.lossfn = lossfn
@@ -18,6 +31,15 @@ class DSClassifier():
         self.model = DSModel()
 
     def fit(self, X, y, add_single_rules=False, single_rules_breaks=2, add_mult_rules=False, **kwargs):
+        """
+        Fits the model masses using gradient descent optimization
+        :param X: Features for training
+        :param y: Labels of features
+        :param add_single_rules: Generates single rules
+        :param single_rules_breaks: Single rule breaks number
+        :param add_mult_rules: Generates multiplication pair rules
+        :param kwargs: In case of debugging, parameters of optimize_debug
+        """
         if add_single_rules:
             self.model.generate_statistic_single_rules(X, breaks=single_rules_breaks)
         if add_mult_rules:
@@ -38,11 +60,11 @@ class DSClassifier():
             raise RuntimeError("Unknown loss function %s" % self.lossfn)
 
         if self.debug_mode:
-            return self.optimize_debug(X, y, optimizer, criterion, **kwargs)
+            return self._optimize_debug(X, y, optimizer, criterion, **kwargs)
         else:
-            return self.optimize(X, y, optimizer, criterion,)
+            return self._optimize(X, y, optimizer, criterion, )
 
-    def optimize(self, X, y, optimizer, criterion):
+    def _optimize(self, X, y, optimizer, criterion):
         losses = []
         self.model.train()
 
@@ -65,8 +87,8 @@ class DSClassifier():
             if epoch > 2 and abs(losses[-2] - loss.data.item()) < self.min_dJ:
                 break
 
-    def optimize_debug(self, X, y, optimizer, criterion, print_init_model=False, print_final_model=False, print_time=True,
-                       print_partial_time=False, print_every_epochs=None, print_least_loss=True, return_patial_dt=False):
+    def _optimize_debug(self, X, y, optimizer, criterion, print_init_model=False, print_final_model=False, print_time=True,
+                       print_partial_time=False, print_every_epochs=None, print_least_loss=True, return_partial_dt=False):
         losses = []
 
         if print_init_model:
@@ -130,12 +152,18 @@ class DSClassifier():
         if print_final_model:
             print self.model
 
-        if return_patial_dt:
+        if return_partial_dt:
             return losses, epoch, dt, dt_forward, dt_loss, dt_optim, dt_norm
         else:
             return losses, epoch, dt
 
     def predict(self, X, one_hot=False):
+        """
+        Predict the classes for the feature vectors
+        :param X: Feature vectors
+        :param one_hot: If true, it is returned the score of belogning to each class
+        :return: Classes for each feature vector
+        """
         self.model.eval()
 
         with torch.no_grad():
@@ -146,3 +174,13 @@ class DSClassifier():
                 _, yt_pred = torch.max(self.model(Xt), 1)
                 yt_pred = yt_pred.numpy()
                 return yt_pred
+
+    def predict_proba(self, X):
+        """
+        Predict the score of belogning to the first class
+        :param X: Feature vectors
+        :return: Score for class 0 for each feature vector
+        """
+        return self.predict(X, one_hot=True)[:,0]
+
+
