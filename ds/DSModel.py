@@ -5,6 +5,7 @@ from torch import nn
 from torch.autograd import Variable
 import numpy as np
 from scipy.stats import norm
+from torch.nn import Softmax
 
 from ds.DSRule import DSRule
 from ds.core import dempster_rule_t, create_random_maf
@@ -15,7 +16,7 @@ class DSModel(nn.Module):
     Torch module implementation of DS Binary Classifier
     """
 
-    def __init__(self):
+    def __init__(self, use_softmax=True, skip_dr_norm=False):
         """
         Creates an empty DS Model
         """
@@ -23,6 +24,10 @@ class DSModel(nn.Module):
         self.masses = []
         self.preds = []
         self.n = 0
+        self.use_softmax = use_softmax
+        self.skip_dr_norm = skip_dr_norm
+        if use_softmax:
+            self.sm = Softmax(dim=0)
 
     def add_rule(self, pred, ma=None, mb=None, mab=None):
         """
@@ -53,8 +58,11 @@ class DSModel(nn.Module):
             else:
                 mf = self.masses[sel[0]]
                 for j in range(1, len(sel)):
-                    mf = dempster_rule_t(mf, self.masses[sel[j]])
-                res = (mf[:2] / torch.sum(mf[:2])).view(2)
+                    mf = dempster_rule_t(mf, self.masses[sel[j]], not self.skip_dr_norm)
+                if self.use_softmax:
+                    res = self.sm(mf[:2])
+                else:
+                    res = (mf[:2] / torch.sum(mf[:2])).view(2)
                 out.append(res)
         return torch.cat(out).view(len(X), 2)
 
@@ -98,7 +106,7 @@ class DSModel(nn.Module):
             classes = [0, 1]
 
         if class_names is None:
-            class_names = ["%d" for i in range(1)]
+            class_names = [str(i) for i in range(2)]
 
         for cls in classes:
             builder += "\n For class %s\n" % class_names[cls]
@@ -133,7 +141,7 @@ class DSModel(nn.Module):
         brks = norm.ppf(np.linspace(0,1,breaks+2))[1:-1]
 
         if column_names is None:
-            column_names = ["X[%d]" for i in range(len(mean))]
+            column_names = ["X[%d]" % i for i in range(len(mean))]
 
         for i in range(len(mean)):
             # First rule
@@ -158,7 +166,7 @@ class DSModel(nn.Module):
         mean = np.nanmean(X, axis=0)
 
         if column_names is None:
-            column_names = ["X[%d]" for i in range(len(mean))]
+            column_names = ["X[%d]" % i for i in range(len(mean))]
 
         offset = 0 if include_square else 1
 

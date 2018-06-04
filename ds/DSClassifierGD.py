@@ -12,7 +12,8 @@ class DSClassifier(ClassifierMixin):
     Implementation of Classifier based on DSModel
     """
 
-    def __init__(self, lr=0.01, max_iter=200, min_dloss=0.001, optim="adam", lossfn="CE", debug_mode=False):
+    def __init__(self, lr=0.005, max_iter=200, min_dloss=0.001, optim="adam", lossfn="CE", debug_mode=False,
+                 use_softmax=False, skip_dr_norm=True):
         """
         Creates the classifier and the DSModel (accesible in attribute model)
         :param lr: Learning rate
@@ -28,7 +29,7 @@ class DSClassifier(ClassifierMixin):
         self.max_iter = max_iter
         self.min_dJ = min_dloss
         self.debug_mode = debug_mode
-        self.model = DSModel()
+        self.model = DSModel(use_softmax=use_softmax, skip_dr_norm=skip_dr_norm)
 
     def fit(self, X, y, add_single_rules=False, single_rules_breaks=2, add_mult_rules=False, column_names=None, **kwargs):
         """
@@ -91,8 +92,17 @@ class DSClassifier(ClassifierMixin):
         return losses, epoch
 
     def _optimize_debug(self, X, y, optimizer, criterion, print_init_model=False, print_final_model=False, print_time=True,
-                       print_partial_time=False, print_every_epochs=None, print_least_loss=True, return_partial_dt=False):
+                        print_partial_time=False, print_every_epochs=None, print_least_loss=True, return_partial_dt=False,
+                        disable_all_print=False):
         losses = []
+
+        if disable_all_print:
+            print_every_epochs = None
+            print_final_model = False
+            print_partial_time = False
+            print_time = False
+            print_least_loss = False
+            print_init_model = False
 
         if print_init_model:
             print self.model

@@ -184,23 +184,29 @@ def compute_gradient_dempster_rule(ax, ay, bx, by, rx, ry):
     return dJdax, dJday, dJdbx, dJdby
 
 
-def dempster_rule_t(m1, m2):
+def dempster_rule_t(m1, m2, normalize=True):
     """
     Computes the Dempster Rule between m1 and m2
     :param m1: The fisrt mass assinment function
     :param m2: The second mass assinment function
     :return: The combined mass assinment function
     """
-    k = m1[0] * m2[1] + m1[1] * m2[0]
+    if normalize:
+        k = m1[0] * m2[1] + m1[1] * m2[0]
 
-    # if k == 1:  # Full uncertainty
-    #    return torch.Tensor([0, 0, 1])
-    nk = 1.0 / (1 - k)
+        # if k == 1:  # Full uncertainty
+        #    return torch.Tensor([0, 0, 1])
+        nk = 1.0 / (1 - k)
 
-    # mf_null = 0
-    mf_no_stroke = nk * (m1[2] * m2[0] + m1[0] * m2[2] + m1[0] * m2[0])
-    mf_stroke = nk * (m1[2] * m2[1] + m1[1] * m2[2] + m1[1] * m2[1])
-    mf_either = nk * m1[2] * m2[2]
+        # mf_null = 0
+        mf_no_stroke = nk * (m1[2] * m2[0] + m1[0] * m2[2] + m1[0] * m2[0])
+        mf_stroke = nk * (m1[2] * m2[1] + m1[1] * m2[2] + m1[1] * m2[1])
+        mf_either = nk * m1[2] * m2[2]
+
+    else:
+        mf_no_stroke = m1[2] * m2[0] + m1[0] * m2[2] + m1[0] * m2[0]
+        mf_stroke = m1[2] * m2[1] + m1[1] * m2[2] + m1[1] * m2[1]
+        mf_either = m1[2] * m2[2]
 
     return torch.cat([mf_no_stroke, mf_stroke, mf_either])
 
