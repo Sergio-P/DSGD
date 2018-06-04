@@ -72,7 +72,10 @@ class DSModel(nn.Module):
         """
         for mass in self.masses:
             mass.data.clamp_(0., 1.)
-            mass.data.div_(torch.sum(mass.data))
+            if self.use_softmax:
+                mass = self.sm(mass)
+            else:
+                mass.data.div_(torch.sum(mass.data))
 
     def _select_rules(self, x):
         x = x.data.numpy()
