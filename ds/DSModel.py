@@ -164,11 +164,11 @@ class DSModel(nn.Module):
 
         for i in range(len(mean)):
             for j in range(i + offset, len(mean)):
-                mk = mean[i] * mean[j]
+                # mk = mean[i] * mean[j]
                 self.add_rule(DSRule(lambda x, i=i, j=j: (x[i] - mean[i]) * (x[j] - mean[j]) > 0,
-                                     "Positive centered %s, %s" % (column_names[i],column_names[i])))
+                                     "Positive %s - %.3f, %s - %.3f" % (column_names[i],mean[i],column_names[j],mean[j])))
                 self.add_rule(DSRule(lambda x, i=i, j=j: (x[i] - mean[i]) * (x[j] - mean[j]) <= 0,
-                                     "Negative centered %s, %s" % (column_names[i],column_names[i])))
+                                     "Negative %s - %.3f, %s - %.3f" % (column_names[i],mean[i],column_names[j],mean[j])))
 
     def load_rules_bin(self, filename):
         """
