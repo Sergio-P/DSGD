@@ -1,8 +1,11 @@
 # coding=utf-8
 import time
+import numpy as np
+import pandas as pd
 import torch
 from sklearn.base import ClassifierMixin
 from torch.autograd import Variable
+from torch.utils.data.sampler import WeightedRandomSampler
 
 from ds.DSModel import DSModel
 
@@ -13,7 +16,7 @@ class DSClassifier(ClassifierMixin):
     """
 
     def __init__(self, lr=0.005, max_iter=200, min_dloss=0.001, optim="adam", lossfn="CE", debug_mode=False,
-                 use_softmax=False, skip_dr_norm=True):
+                 use_softmax=False, skip_dr_norm=True, batch_size=4000, num_workers=1, balance_class_data=False):
         """
         Creates the classifier and the DSModel (accesible in attribute model)
         :param lr: Learning rate
@@ -27,7 +30,10 @@ class DSClassifier(ClassifierMixin):
         self.optim = optim
         self.lossfn = lossfn
         self.max_iter = max_iter
+        self.batch_size = batch_size
+        self.num_workers = num_workers
         self.min_dJ = min_dloss
+        self.balance_class_data = balance_class_data
         self.debug_mode = debug_mode
         self.model = DSModel(use_softmax=use_softmax, skip_dr_norm=skip_dr_norm)
 
@@ -41,6 +47,15 @@ class DSClassifier(ClassifierMixin):
         :param add_mult_rules: Generates multiplication pair rules
         :param kwargs: In case of debugging, parameters of optimize_debug
         """
+        if self.balance_class_data:
+            nmin = np.max(np.bincount(y))
+            Xm = pd.DataFrame(np.concatenate((X,y.reshape(-1,1)), axis=1))
+            Xm = pd.concat([Xm[Xm.iloc[:,-1] == 0].sample(n=nmin, replace=True),
+                            Xm[Xm.iloc[:,-1] == 1].sample(n=nmin, replace=True)], axis=0)\
+                    .sample(frac=1).reset_index(drop=True).values
+            X = Xm[:,:-1]
+            y = Xm[:,-1].astype(int)
+
         if add_single_rules:
             self.model.generate_statistic_single_rules(X, breaks=single_rules_breaks, column_names=column_names)
         if add_mult_rules:
@@ -114,7 +129,6 @@ class DSClassifier(ClassifierMixin):
         ti = time.time()
 
         self.model.train()
-        epoch = 0
         Xt = Variable(torch.Tensor(X))
 
         if self.lossfn == "CE":
@@ -123,30 +137,38 @@ class DSClassifier(ClassifierMixin):
             yt = torch.Tensor(y).view(len(y), 1)
             yt = Variable(torch.cat([yt == 0, yt == 1], 1).float())
 
+        dataset = torch.utils.data.TensorDataset(Xt, yt)
+        train_loader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
+                                                   num_workers=self.num_workers, pin_memory=True)
+
+        epoch = 0
         for epoch in range(self.max_iter):
             if print_every_epochs is not None and epoch % print_every_epochs == 0:
                 print "Processing epoch %d" % (epoch + 1)
+            acc_loss = 0
+            for Xi, yi in train_loader:
+                tq = time.time()
+                y_pred = self.model.forward(Xi)
+                dt_forward += time.time() - tq
 
-            tq = time.time()
-            y_pred = self.model.forward(Xt)
-            dt_forward += time.time() - tq
+                tq = time.time()
+                loss = criterion(y_pred, yi)
+                optimizer.zero_grad()
+                loss.backward()
+                dt_loss += time.time() - tq
 
-            tq = time.time()
-            loss = criterion(y_pred, yt)
-            optimizer.zero_grad()
-            loss.backward()
-            dt_loss += time.time() - tq
+                tq = time.time()
+                optimizer.step()
+                dt_optim += time.time() - tq
 
-            tq = time.time()
-            optimizer.step()
-            dt_optim += time.time() - tq
+                tq = time.time()
+                self.model.normalize()
+                dt_norm += time.time() - tq
 
-            tq = time.time()
-            self.model.normalize()
-            dt_norm += time.time() - tq
+                acc_loss += loss.data.item()
 
-            losses.append(loss.data.item())
-            if epoch > 2 and abs(losses[-2] - loss.data.item()) < self.min_dJ:
+            losses.append(acc_loss)
+            if epoch > 2 and abs(losses[-2] - acc_loss) < self.min_dJ:
                 break
 
         dt = time.time() - ti

@@ -17,9 +17,9 @@ if True:
 # for N in np.linspace(50, 3050, 10):
     N = int(N)
 
-    X, y = make_blobs(n_samples=N, n_features=m, centers=4, cluster_std=1., random_state=10)
+    X, y = make_blobs(n_samples=N, n_features=m, centers=4, cluster_std=1., random_state=42)
 
-    y = y/2
+    y = y/3
 
     cut = int(0.7 * len(X))
 
@@ -28,7 +28,8 @@ if True:
     X_test = X[cut:, :]
     y_test = y[cut:]
 
-    DSC = DSClassifier(max_iter=200, lr=0.01, debug_mode=True, use_softmax=True, skip_dr_norm=True)
+    DSC = DSClassifier(max_iter=200, lr=0.005, debug_mode=True, use_softmax=False, skip_dr_norm=True,
+                       balance_class_data=True)
     losses, epoch, dt, dt_forward, dt_loss, dt_optim, dt_norm = DSC.fit(X_train, y_train, add_single_rules=True,
                                                                         single_rules_breaks=k, add_mult_rules=True,
                                                                         return_partial_dt=True, disable_all_print=True)

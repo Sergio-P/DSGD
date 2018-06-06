@@ -23,10 +23,10 @@ data = data.sample(frac=1).reset_index(drop=True)
 
 cut = int(0.7*len(data))
 
-X_train = data.iloc[:cut, :-1].as_matrix()
-y_train = data.iloc[:cut, -1].as_matrix()
-X_test = data.iloc[cut:, :-1].as_matrix()
-y_test = data.iloc[cut:, -1].as_matrix()
+X_train = data.iloc[:cut, :-1].values
+y_train = data.iloc[:cut, -1].values
+X_test = data.iloc[cut:, :-1].values
+y_test = data.iloc[cut:, -1].values
 
 model = DSModel()
 model.generate_statistic_single_rules(X_train, breaks=2)
