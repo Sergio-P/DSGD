@@ -8,13 +8,13 @@ from ds.DSClassifierGD import DSClassifier
 
 data = pd.read_csv("data/stroke_data.csv")
 
+data = data.drop("0", axis=1)
 data = data.drop("pid", axis=1)
 data = data.drop("index", axis=1)
 
 data = data.dropna(thresh=10)
-data["class"] = data["class"].map({0.: 0, 1.: 1})
-
 data = data.apply(pd.to_numeric, args=("coerce",))
+data["cls"] = data["cls"].map({0.: 0, 1.: 1})
 data = data.sample(frac=1).reset_index(drop=True)
 
 cut = int(0.7*len(data))
