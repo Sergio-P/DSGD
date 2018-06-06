@@ -17,9 +17,11 @@ if True:
 # for N in np.linspace(50, 3050, 10):
     N = int(N)
 
-    X, y = make_blobs(n_samples=N, n_features=m, centers=4, cluster_std=1., random_state=42)
+    X, y = make_blobs(n_samples=N, n_features=m, centers=2, cluster_std=1., random_state=10)
 
-    y = y/3
+    X = np.concatenate((X, (X[:,1] > 0).astype(int).reshape(-1,1)), axis=1)
+
+    # y = y/3
 
     cut = int(0.7 * len(X))
 

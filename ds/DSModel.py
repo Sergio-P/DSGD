@@ -9,6 +9,7 @@ from torch.nn import Softmax
 
 from ds.DSRule import DSRule
 from ds.core import dempster_rule_t, create_random_maf
+from ds.utils import is_categorical
 
 
 class DSModel(nn.Module):
@@ -147,16 +148,21 @@ class DSModel(nn.Module):
             column_names = ["X[%d]" % i for i in range(len(mean))]
 
         for i in range(len(mean)):
-            # First rule
-            v = mean[i] + std[i] * brks[0]
-            self.add_rule(DSRule(lambda x, i=i: x[i] <= v, "%s < %.3f" % (column_names[i], v)))
-            # Mid rules
-            for j in range(1, len(brks)):
-                vl = v
-                v = mean[i] + std[i] * brks[j]
-                self.add_rule(DSRule(lambda x, i=i: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, column_names[i], v)))
-            # Last rule
-            self.add_rule(DSRule(lambda x, i=i: x[i] > v, "%s > %.3f" % (column_names[i], v)))
+            if is_categorical(X[:,i]):
+                categories = np.unique(X[:,i])
+                for cat in categories:
+                    self.add_rule(DSRule(lambda x, i=i, k=cat: x[i] == k, "%s = %s" % (column_names[i], str(cat))))
+            else:
+                # First rule
+                v = mean[i] + std[i] * brks[0]
+                self.add_rule(DSRule(lambda x, i=i: x[i] <= v, "%s < %.3f" % (column_names[i], v)))
+                # Mid rules
+                for j in range(1, len(brks)):
+                    vl = v
+                    v = mean[i] + std[i] * brks[j]
+                    self.add_rule(DSRule(lambda x, i=i: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, column_names[i], v)))
+                # Last rule
+                self.add_rule(DSRule(lambda x, i=i: x[i] > v, "%s > %.3f" % (column_names[i], v)))
 
     def generate_mult_pair_rules(self, X, column_names=None, include_square=False):
         """
