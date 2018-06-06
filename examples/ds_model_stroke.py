@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_curve
 
 from ds.DSClassifierGD import DSClassifier
 
@@ -31,6 +33,7 @@ y_score = DSC.predict_proba(X_test)
 
 print "\nTraining Time: %.1f" % dt
 print "Epochs: %d" % epoch
+print "Total Rules: %d" % len(DSC.model.get_rules_size())
 print "Min Loss: %.3f" % losses[-1]
 print "Accuracy: %.1f%%" % (accuracy_score(y_test, y_pred) * 100.)
 print "Confusion Matrix:"
@@ -38,3 +41,41 @@ print confusion_matrix(y_test, y_pred)
 print "AUC score: %.3f" % (roc_auc_score(y_test, y_score))
 
 print DSC.model.find_most_important_rules(threshold=0.2, class_names=["No Stroke", "Stroke"])
+
+# Plotting #
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+EXP_PREFIX = "stroke-1"
+
+# Loss curve
+plt.plot(range(len(losses)), np.array(losses)/4)
+plt.xlabel("Epochs")
+plt.ylabel("Cross Entropy")
+plt.title("Training Error")
+plt.savefig("%s-error.png")
+
+# ROC Curve
+plt.plot([0, 1], [0, 1], 'k--', label="Random")
+fpr, tpr, _ = roc_curve(y_test, y_score)
+np.savetxt("%s-roc.csv" % EXP_PREFIX, np.concatenate((fpr,tpr)))
+plt.plot(fpr[1:-1], tpr[1:-1], "DS Model")
+plt.xlabel("False positive rate")
+plt.ylabel("True positive rate")
+plt.title("ROC Curve for Stroke Prediction")
+plt.grid("on")
+plt.axis([0, 1, 0, 1])
+plt.savefig("%s-roc.png" % EXP_PREFIX)
+
+pre, rec, _ = precision_recall_curve(y_test, y_score)
+np.savetxt("%s-prc.csv" % EXP_PREFIX, np.concatenate((pre,rec)))
+plt.xlabel("Recall")
+plt.plot(rec[1:-1], pre[1:-1])
+plt.xlabel("Recall")
+plt.ylabel("Precision")
+plt.title("PR Curve for Stroke prediction")
+plt.grid("on")
+plt.axis([0, 1, 0, 1])
+plt.savefig("%s-prc.png" % EXP_PREFIX)

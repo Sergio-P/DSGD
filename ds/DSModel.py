@@ -207,3 +207,6 @@ class DSModel(nn.Module):
         with open(filename, "w") as f:
             sv = {"preds": self.preds, "masses": self.masses}
             pickle.dump(sv, f, pickle.HIGHEST_PROTOCOL)
+
+    def get_rules_size(self):
+        return self.n

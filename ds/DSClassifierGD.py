@@ -217,5 +217,3 @@ class DSClassifier(ClassifierMixin):
         :return: Score for class 0 for each feature vector
         """
         return self.predict(X, one_hot=True)[:,1]
-
-
