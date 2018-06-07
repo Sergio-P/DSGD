@@ -26,10 +26,10 @@ def statistic_breaks(data, k=5, sigma_tol=1, append_infinity=False):
         return [x for x in lsp]
 
 
-def is_categorical(arr):
+def is_categorical(arr, max_cat = 10):
     # if len(df.unique()) <= 10:
     #     print df.unique()
-    return len(np.unique(arr)) <= 10
+    return len(np.unique(arr[~np.isnan(arr)])) <= max_cat
 
 
 def normalize(a, b, c):

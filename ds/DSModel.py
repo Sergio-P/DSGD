@@ -149,7 +149,7 @@ class DSModel(nn.Module):
 
         for i in range(len(mean)):
             if is_categorical(X[:,i]):
-                categories = np.unique(X[:,i])
+                categories = np.unique(X[:,i][~np.isnan(X[:,i])])
                 for cat in categories:
                     self.add_rule(DSRule(lambda x, i=i, k=cat: x[i] == k, "%s = %s" % (column_names[i], str(cat))))
             else:
@@ -163,6 +163,26 @@ class DSModel(nn.Module):
                     self.add_rule(DSRule(lambda x, i=i: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, column_names[i], v)))
                 # Last rule
                 self.add_rule(DSRule(lambda x, i=i: x[i] > v, "%s > %.3f" % (column_names[i], v)))
+
+    def generate_categorical_rules(self, X, column_names=None, exclude=None):
+        """
+        Populates the model with attribute-independant rules based on categories of attributes, continous columns are
+        skipped.
+        :param X: Set of inputs (can be the same as training or a sample)
+        :param column_names: Column attribute names
+        """
+        m = X.shape[1]
+        if column_names is None:
+            column_names = ["X[%d]" % i for i in range(m)]
+
+        if exclude is None:
+            exclude = []
+
+        for i in range(m):
+            if is_categorical(X[:,i]) and column_names[i] not in exclude:
+                categories = np.unique(X[:,i][~np.isnan(X[:,i])])
+                for cat in categories:
+                    self.add_rule(DSRule(lambda x, i=i, k=cat: x[i] == k, "%s = %s" % (column_names[i], str(cat))))
 
     def generate_mult_pair_rules(self, X, column_names=None, include_square=False):
         """
@@ -186,6 +206,56 @@ class DSModel(nn.Module):
                                      "Positive %s - %.3f, %s - %.3f" % (column_names[i],mean[i],column_names[j],mean[j])))
                 self.add_rule(DSRule(lambda x, i=i, j=j: (x[i] - mean[i]) * (x[j] - mean[j]) <= 0,
                                      "Negative %s - %.3f, %s - %.3f" % (column_names[i],mean[i],column_names[j],mean[j])))
+
+    def generate_custom_range_single_rules(self, column_names, name, breaks):
+        """
+        Populates the model with attribute-independant rules based on custom defined breaks.
+        In total this method generates len(breaks) + 1 rules
+        :param column_names: Column attribute names
+        :param name: The target column name to generate rules
+        :param breaks: Array of float indicating the values of the breaks
+        """
+        i = column_names.tolist().index(name)
+        if i == -1:
+            raise NameError("Cannot find column with name %s" % name)
+        v = breaks[0]
+        # First rule
+        self.add_rule(DSRule(lambda x, i=i: x[i] <= v, "%s < %.3f" % (name, v)))
+        # Mid rules
+        for j in range(1, len(breaks)):
+            vl = v
+            v = breaks[j]
+            self.add_rule(DSRule(lambda x, i=i: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, name, v)))
+        # Last rule
+        self.add_rule(DSRule(lambda x, i=i: x[i] > v, "%s > %.3f" % (name, v)))
+
+    def generate_custom_range_rules_by_gender(self, column_names, name, breaks_men, breaks_women, gender_name="gender"):
+        """
+        Populates the model with attribute-independant rules based on custom defined breaks separated by gender.
+        :param column_names: Column attribute names
+        :param name: The target column name to generate rules
+        :param breaks_men: Array of float indicating the values of the breaks for men
+        :param breaks_women: Array of float indicating the values of the breaks for women
+        :param gender_name: Name of the column containing the gender
+        """
+        i = column_names.tolist().index(name)
+        g = column_names.tolist().index(gender_name)
+
+        if i == -1 or g == -1:
+            raise NameError("Cannot find column with name %s" % name)
+
+        for gv, gname, breaks in [(0, "Men", breaks_men), (1, "Women", breaks_women)]:
+            v = breaks[0]
+            # First rule
+            self.add_rule(DSRule(lambda x, i=i: x[g] == gv and x[i] <= v, "%s: %s < %.3f" % (gname, name, v)))
+            # Mid rules
+            for j in range(1, len(breaks)):
+                vl = v
+                v = breaks[j]
+                self.add_rule(DSRule(lambda x, i=i: x[g] == gv and vl <= x[i] < v, "%s: %.3f < %s < %.3f" %
+                                     (gname, vl, name, v)))
+            # Last rule
+            self.add_rule(DSRule(lambda x, i=i: x[g] == gv and x[i] > v, "%s: %s > %.3f" % (gname, name, v)))
 
     def load_rules_bin(self, filename):
         """

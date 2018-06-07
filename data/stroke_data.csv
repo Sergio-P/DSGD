@@ -1,4 +1,4 @@
-index,pid,age,gender,bmis,body_fat,body_weights,heights,waist_measurements,TG,WBC,protein_qualitative,blood_glucose,HbA1C/JDS,HDL-C,RBC,Hb,Ht,MCV,MCH,MCHC,PLT,UA,CREA,GOT,GPT,sugar_qualitative,occult_blood_reaction,ALP,gamma−GT(GTP),LDL-C,HbA1c(NGSP),cls,0
+index,pid,age,gender,bmis,body_fat,body_weights,heights,waist_measurements,TG,WBC,protein_qualitative,blood_glucose,HbA1C/JDS,HDL-C,RBC,Hb,Ht,MCV,MCH,MCHC,PLT,UA,CREA,GOT,GPT,sugar_qualitative,occult_blood_reaction,ALP,GGT,LDL-C,HbA1c(NGSP),cls,0
 0,000000055,89,1.0,,,,,,45.0,6000.0,0.0,107.0,5.6,75.0,369.0,10.9,33.9,91.9,29.5,32.2,15.1,2.6,0.52,17.0,10.0,0.0,0.0,226.0,17.0,137.8,6.3,0,
 1,000000103,79,0.0,23.1,,55.4,154.6,92.0,277.0,4400.0,0.0,100.0,5.3,54.0,444.0,15.6,44.4,100.0,35.1,35.1,26.5,,0.62,27.0,22.0,0.0,0.0,290.0,27.0,116.0,,1,
 2,000000176,85,1.0,,,,,,75.0,6200.0,0.0,90.0,5.4,36.0,289.0,10.0,31.3,108.3,34.6,31.9,24.5,3.6,0.83,25.0,11.0,0.0,1.0,232.0,8.0,73.0,5.9,0,
