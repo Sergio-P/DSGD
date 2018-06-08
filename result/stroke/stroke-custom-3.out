@@ -1,0 +1,121 @@
+Processing epoch 1
+Processing epoch 2
+Processing epoch 3
+Processing epoch 4
+Processing epoch 5
+Processing epoch 6
+Processing epoch 7
+Processing epoch 8
+Processing epoch 9
+Processing epoch 10
+Processing epoch 11
+Processing epoch 12
+Processing epoch 13
+Processing epoch 14
+Processing epoch 15
+Processing epoch 16
+
+Training time: 3139.74s, epochs: 15
+
+Least training loss reached: 2.617
+
+Training Time: 3139.7
+Epochs: 15
+Total Rules: 97
+Min Loss: 2.617
+Accuracy: 64.6%
+Confusion Matrix:
+[[2213 1025]
+ [ 508  579]]
+AUC score: 0.647
+Most important rules
+
+ For class No Stroke
+  Rule 59: ALP > 1400.000 (0.344)
+	 A: 0.344	 B: 0.000	A,B: 0.656
+  Rule 53: GOT > 100.000 (0.329)
+	 A: 0.329	 B: 0.000	A,B: 0.671
+  Rule 56: GPT > 100.000 (0.328)
+	 A: 0.328	 B: 0.000	A,B: 0.672
+  Rule 27: MCH < 27.000 (0.309)
+	 A: 0.309	 B: 0.000	A,B: 0.691
+  Rule 40: 120.000 < LDL-C < 160.000 (0.308)
+	 A: 0.308	 B: 0.000	A,B: 0.692
+  Rule 21: WBC > 10000.000 (0.306)
+	 A: 0.306	 B: 0.000	A,B: 0.694
+  Rule 48: HDL-C < 40.000 (0.297)
+	 A: 0.297	 B: 0.000	A,B: 0.703
+  Rule 38: UA > 7.000 (0.288)
+	 A: 0.288	 B: 0.000	A,B: 0.712
+  Rule 62: GGT > 100.000 (0.286)
+	 A: 0.286	 B: 0.000	A,B: 0.714
+  Rule 17: occult_blood_reaction = 3.0 (0.270)
+	 A: 0.270	 B: 0.000	A,B: 0.730
+  Rule 57: ALP < 200.000 (0.269)
+	 A: 0.269	 B: 0.000	A,B: 0.731
+  Rule 50: HDL-C > 60.000 (0.267)
+	 A: 0.267	 B: 0.000	A,B: 0.733
+  Rule 26: MCV > 102.000 (0.258)
+	 A: 0.258	 B: 0.000	A,B: 0.742
+  Rule 96: Women: waist_measurements < 88.000 (0.254)
+	 A: 0.254	 B: 0.000	A,B: 0.746
+  Rule 76: 35.000 < bmis < 40.000 (0.245)
+	 A: 0.245	 B: 0.000	A,B: 0.755
+  Rule 39: LDL-C < 120.000 (0.239)
+	 A: 0.239	 B: 0.000	A,B: 0.761
+  Rule 16: occult_blood_reaction = 2.0 (0.235)
+	 A: 0.235	 B: 0.000	A,B: 0.765
+  Rule 37: 2.000 < UA < 7.000 (0.235)
+	 A: 0.235	 B: 0.000	A,B: 0.765
+  Rule 94: Men: waist_measurements < 102.000 (0.227)
+	 A: 0.227	 B: 0.000	A,B: 0.773
+  Rule 5: protein_qualitative = 3.0 (0.220)
+	 A: 0.220	 B: 0.000	A,B: 0.780
+  Rule 41: LDL-C > 160.000 (0.217)
+	 A: 0.219	 B: 0.002	A,B: 0.779
+  Rule 13: occult_blood_reaction = 0.0 (0.216)
+	 A: 0.216	 B: 0.000	A,B: 0.784
+  Rule 92: Women: 14.000 < body_fat < 24.000 (0.203)
+	 A: 0.206	 B: 0.003	A,B: 0.792
+  Rule 14: occult_blood_reaction = 0.5 (0.201)
+	 A: 0.201	 B: 0.000	A,B: 0.799
+
+ For class Stroke
+  Rule 24: MCV < 88.000 (0.298)
+	 A: 0.000	 B: 0.298	A,B: 0.702
+  Rule 32: MCHC > 35.000 (0.298)
+	 A: 0.000	 B: 0.298	A,B: 0.702
+  Rule 67: HbA1C/JDS < 6.000 (0.297)
+	 A: 0.000	 B: 0.297	A,B: 0.703
+  Rule 9: sugar_qualitative = 1.0 (0.281)
+	 A: 0.000	 B: 0.281	A,B: 0.719
+  Rule 78: age < 80.000 (0.270)
+	 A: 0.000	 B: 0.270	A,B: 0.730
+  Rule 29: MCH > 32.000 (0.263)
+	 A: 0.000	 B: 0.263	A,B: 0.737
+  Rule 19: WBC < 4000.000 (0.253)
+	 A: 0.000	 B: 0.253	A,B: 0.747
+  Rule 72: bmis < 18.000 (0.251)
+	 A: 0.000	 B: 0.251	A,B: 0.749
+  Rule 35: PLT > 40.000 (0.250)
+	 A: 0.000	 B: 0.250	A,B: 0.750
+  Rule 15: occult_blood_reaction = 1.0 (0.249)
+	 A: 0.000	 B: 0.249	A,B: 0.751
+  Rule 18: occult_blood_reaction = 4.0 (0.245)
+	 A: 0.000	 B: 0.245	A,B: 0.755
+  Rule 68: 6.000 < HbA1C/JDS < 7.000 (0.239)
+	 A: 0.000	 B: 0.239	A,B: 0.761
+  Rule 66: blood_glucose > 200.000 (0.237)
+	 A: 0.000	 B: 0.237	A,B: 0.763
+  Rule 93: Women: body_fat > 24.000 (0.222)
+	 A: 0.000	 B: 0.222	A,B: 0.778
+  Rule 71: HbA1C/JDS > 11.000 (0.220)
+	 A: 0.000	 B: 0.220	A,B: 0.780
+  Rule 70: 9.000 < HbA1C/JDS < 11.000 (0.218)
+	 A: 0.002	 B: 0.220	A,B: 0.778
+  Rule 22: Ht < 38.000 (0.216)
+	 A: 0.000	 B: 0.216	A,B: 0.784
+  Rule 83: Men: Hb > 13.000 (0.208)
+	 A: 0.000	 B: 0.208	A,B: 0.792
+  Rule 10: sugar_qualitative = 2.0 (0.200)
+	 A: 0.000	 B: 0.200	A,B: 0.800

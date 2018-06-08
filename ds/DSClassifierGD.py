@@ -15,7 +15,7 @@ class DSClassifier(ClassifierMixin):
     Implementation of Classifier based on DSModel
     """
 
-    def __init__(self, lr=0.005, max_iter=200, min_dloss=0.001, optim="adam", lossfn="CE", debug_mode=False,
+    def __init__(self, lr=0.005, max_iter=200, min_iter=2, min_dloss=0.001, optim="adam", lossfn="CE", debug_mode=False,
                  use_softmax=False, skip_dr_norm=True, batch_size=4000, num_workers=1, balance_class_data=False):
         """
         Creates the classifier and the DSModel (accesible in attribute model)
@@ -29,6 +29,7 @@ class DSClassifier(ClassifierMixin):
         self.lr = lr
         self.optim = optim
         self.lossfn = lossfn
+        self.min_iter = min_iter
         self.max_iter = max_iter
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -91,17 +92,23 @@ class DSClassifier(ClassifierMixin):
             yt = torch.Tensor(y).view(len(y), 1)
             yt = Variable(torch.cat([yt == 0, yt == 1], 1).float())
 
+        dataset = torch.utils.data.TensorDataset(Xt, yt)
+        train_loader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
+                                                   num_workers=self.num_workers, pin_memory=True)
         epoch = 0
         for epoch in range(self.max_iter):
-            y_pred = self.model.forward(Xt)
-            loss = criterion(y_pred, yt)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            self.model.normalize()
+            acc_loss = 0
+            for Xi, yi in train_loader:
+                y_pred = self.model.forward(Xi)
+                loss = criterion(y_pred, yi)
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                self.model.normalize()
+                acc_loss += loss.data.item()
 
-            losses.append(loss.data.item())
-            if epoch > 2 and abs(losses[-2] - loss.data.item()) < self.min_dJ:
+            losses.append(acc_loss)
+            if epoch > self.min_iter and abs(losses[-2] - acc_loss) < self.min_dJ:
                 break
 
         return losses, epoch
@@ -168,7 +175,7 @@ class DSClassifier(ClassifierMixin):
                 acc_loss += loss.data.item()
 
             losses.append(acc_loss)
-            if epoch > 2 and abs(losses[-2] - acc_loss) < self.min_dJ:
+            if epoch > self.min_iter and abs(losses[-2] - acc_loss) < self.min_dJ:
                 break
 
         dt = time.time() - ti

@@ -1,0 +1,121 @@
+Processing epoch 1
+Processing epoch 2
+Processing epoch 3
+Processing epoch 4
+Processing epoch 5
+Processing epoch 6
+Processing epoch 7
+Processing epoch 8
+Processing epoch 9
+Processing epoch 10
+Processing epoch 11
+Processing epoch 12
+Processing epoch 13
+Processing epoch 14
+Processing epoch 15
+Processing epoch 16
+Processing epoch 17
+Processing epoch 18
+Processing epoch 19
+Processing epoch 20
+Processing epoch 21
+Processing epoch 22
+Processing epoch 23
+Processing epoch 24
+Processing epoch 25
+Processing epoch 26
+Processing epoch 27
+Processing epoch 28
+Processing epoch 29
+Processing epoch 30
+Processing epoch 31
+Processing epoch 32
+
+Training time: 4903.76s, epochs: 31
+
+Least training loss reached: 2.652
+
+Training Time: 4903.8
+Epochs: 31
+Total Rules: 176
+Min Loss: 2.652
+Accuracy: 65.7%
+Confusion Matrix:
+[[2239  972]
+ [ 511  603]]
+AUC score: 0.659
+Most important rules
+
+ For class No Stroke
+  Rule 111: PLT < 12.760 (0.405)
+	 A: 0.405	 B: 0.000	A,B: 0.595
+  Rule 170: LDL-C > 131.789 (0.368)
+	 A: 0.368	 B: 0.000	A,B: 0.632
+  Rule 81: Hb < 10.575 (0.362)
+	 A: 0.362	 B: 0.000	A,B: 0.638
+  Rule 126: 1.036 < CREA < 1.502 (0.340)
+	 A: 0.340	 B: 0.000	A,B: 0.660
+  Rule 158: ALP > 458.063 (0.336)
+	 A: 0.336	 B: 0.000	A,B: 0.664
+  Rule 176: HbA1c(NGSP) > 7.181 (0.332)
+	 A: 0.332	 B: 0.000	A,B: 0.668
+  Rule 73: 59.562 < HDL-C < 68.329 (0.324)
+	 A: 0.324	 B: 0.000	A,B: 0.676
+  Rule 71: 45.489 < HDL-C < 52.525 (0.319)
+	 A: 0.319	 B: 0.000	A,B: 0.681
+  Rule 15: body_fat < 17.511 (0.307)
+	 A: 0.307	 B: 0.000	A,B: 0.693
+  Rule 38: waist_measurements > 92.164 (0.305)
+	 A: 0.305	 B: 0.000	A,B: 0.695
+  Rule 82: 10.575 < Hb < 11.673 (0.304)
+	 A: 0.304	 B: 0.000	A,B: 0.696
+  Rule 20: body_fat > 26.825 (0.301)
+	 A: 0.301	 B: 0.000	A,B: 0.699
+  Rule 159: gamma−GT(GTP) < -30.502 (0.290)
+	 A: 0.290	 B: 0.000	A,B: 0.710
+  Rule 69: HDL-C < 36.722 (0.286)
+	 A: 0.286	 B: 0.000	A,B: 0.714
+  Rule 127: 1.502 < CREA < 2.083 (0.269)
+	 A: 0.269	 B: 0.000	A,B: 0.731
+  Rule 122: UA > 6.983 (0.267)
+	 A: 0.267	 B: 0.000	A,B: 0.733
+  Rule 83: 11.673 < Hb < 12.554 (0.262)
+	 A: 0.262	 B: 0.000	A,B: 0.738
+  Rule 171: HbA1c(NGSP) < 5.136 (0.260)
+	 A: 0.260	 B: 0.000	A,B: 0.740
+  Rule 74: HDL-C > 68.329 (0.251)
+	 A: 0.251	 B: 0.000	A,B: 0.749
+  Rule 160: -30.502 < gamma−GT(GTP) < 11.579 (0.235)
+	 A: 0.241	 B: 0.005	A,B: 0.754
+  Rule 72: 52.525 < HDL-C < 59.562 (0.235)
+	 A: 0.235	 B: 0.000	A,B: 0.765
+  Rule 117: UA < 3.551 (0.229)
+	 A: 0.229	 B: 0.000	A,B: 0.771
+  Rule 124: -0.012 < CREA < 0.569 (0.219)
+	 A: 0.219	 B: 0.000	A,B: 0.781
+  Rule 44: TG > 198.006 (0.205)
+	 A: 0.205	 B: 0.000	A,B: 0.795
+
+ For class Stroke
+  Rule 68: HbA1C/JDS > 6.786 (0.407)
+	 A: 0.000	 B: 0.407	A,B: 0.593
+  Rule 9: bmis < 17.178 (0.358)
+	 A: 0.000	 B: 0.358	A,B: 0.642
+  Rule 133: 97.535 < GOT < 176.648 (0.296)
+	 A: 0.000	 B: 0.296	A,B: 0.704
+  Rule 1: age < 60.063 (0.291)
+	 A: 0.000	 B: 0.291	A,B: 0.709
+  Rule 131: -29.451 < GOT < 34.042 (0.275)
+	 A: 0.000	 B: 0.275	A,B: 0.725
+  Rule 116: PLT > 28.749 (0.270)
+	 A: 0.000	 B: 0.270	A,B: 0.730
+  Rule 63: HbA1C/JDS < 4.671 (0.255)
+	 A: 0.000	 B: 0.255	A,B: 0.745
+  Rule 86: Hb > 14.533 (0.244)
+	 A: 0.000	 B: 0.244	A,B: 0.756
+  Rule 6: age > 85.965 (0.225)
+	 A: 0.000	 B: 0.225	A,B: 0.775
+  Rule 98: MCV > 100.672 (0.217)
+	 A: 0.000	 B: 0.217	A,B: 0.783
+  Rule 32: heights > 170.015 (0.200)
+	 A: 0.000	 B: 0.200	A,B: 0.800
