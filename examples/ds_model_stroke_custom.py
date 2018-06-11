@@ -5,6 +5,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 
 from ds.DSClassifierGD import DSClassifier
+from ds.DSRule import DSRule
 
 data = pd.read_csv("data/stroke_data.csv")
 
@@ -51,6 +52,17 @@ DSC.model.generate_custom_range_single_rules(data.columns[:-1], "age", [80])
 DSC.model.generate_custom_range_rules_by_gender(data.columns[:-1], "Hb", [7, 10, 13], [7, 10, 12])
 DSC.model.generate_custom_range_rules_by_gender(data.columns[:-1], "body_fat", [8, 20], [14, 24])
 DSC.model.generate_custom_range_rules_by_gender(data.columns[:-1], "waist_measurements", [102], [88])
+
+# Custom 2-attr rules
+ihbac1 = data.columns.get_loc("HbA1C/JDS")
+ihdl = data.columns.get_loc("HDL-C")
+ildl = data.columns.get_loc("LDL-C")
+ihb = data.columns.get_loc("Hb")
+iht = data.columns.get_loc("Ht")
+DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ildl] > 160, "High HbA1c and high LDL-C"))
+DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ihdl] < 40, "High HbA1c and low HDL-C"))
+DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ihb] > 8, "High HbA1c and high Hb"))
+DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ildl] > 38, "High HbA1c and high Ht"))
 
 losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=False, add_mult_rules=False, print_every_epochs=1)
 y_pred = DSC.predict(X_test)

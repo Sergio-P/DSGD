@@ -212,6 +212,6 @@ def dempster_rule_t(m1, m2, normalize=True):
 
 
 if __name__ == '__main__':
-    m1 = (0, 0.1, 0.1, 0.8)
-    m2 = (0, 0, 0.25, 0.75)
+    m1 = (0, 0.32, 0.08, 0.60)
+    m2 = (0, 0.36, 0.18, 0.46)
     print dempster_rule_chain(m2, m1)
