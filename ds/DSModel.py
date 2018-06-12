@@ -257,6 +257,33 @@ class DSModel(nn.Module):
             # Last rule
             self.add_rule(DSRule(lambda x, i=i: x[g] == gv and x[i] > v, "%s: %s > %.3f" % (gname, name, v)))
 
+    def generate_outside_range_pair_rules(self, column_names, ranges):
+        """
+        Populates the model with outside-normal-range pair of attributes rules
+        :param column_names: The columns names in the dataset
+        :param ranges: Matrix size (k,3) indicating the lower, the upper bound and the name of the column
+        """
+        for index_i in range(len(ranges)):
+            col_i = ranges[index_i][2]
+            i = column_names.tolist().index(col_i)
+            for index_j in range(index_i + 1, len(ranges)):
+                col_j = ranges[index_j][2]
+                j = column_names.tolist().index(col_j)
+                # Extract ranges
+                li = ranges[index_i][0]
+                hi = ranges[index_i][1]
+                lj = ranges[index_j][0]
+                hj = ranges[index_j][1]
+                # Add Rules
+                if not np.isnan(li) and not np.isnan(lj):
+                    self.add_rule(lambda x, i=i, j=j: x[i] < li and x[j] < lj, "Low %s and Low %s" % (col_i, col_j))
+                if not np.isnan(hi) and not np.isnan(lj):
+                    self.add_rule(lambda x, i=i, j=j: x[i] > hi and x[j] < lj, "High %s and Low %s" % (col_i, col_j))
+                if not np.isnan(hi) and not np.isnan(hj):
+                    self.add_rule(lambda x, i=i, j=j: x[i] > hi and x[j] > hj, "High %s and High %s" % (col_i, col_j))
+                if not np.isnan(li) and not np.isnan(hj):
+                    self.add_rule(lambda x, i=i, j=j: x[i] < li and x[j] > hj, "Low %s and High %s" % (col_i, col_j))
+
     def load_rules_bin(self, filename):
         """
         Loads rules from a file, it deletes previous rules

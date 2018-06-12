@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.metrics import precision_recall_curve
@@ -54,15 +55,40 @@ DSC.model.generate_custom_range_rules_by_gender(data.columns[:-1], "body_fat", [
 DSC.model.generate_custom_range_rules_by_gender(data.columns[:-1], "waist_measurements", [102], [88])
 
 # Custom 2-attr rules
-ihbac1 = data.columns.get_loc("HbA1C/JDS")
-ihdl = data.columns.get_loc("HDL-C")
-ildl = data.columns.get_loc("LDL-C")
-ihb = data.columns.get_loc("Hb")
-iht = data.columns.get_loc("Ht")
-DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ildl] > 160, "High HbA1c and high LDL-C"))
-DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ihdl] < 40, "High HbA1c and low HDL-C"))
-DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ihb] > 8, "High HbA1c and high Hb"))
-DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ildl] > 38, "High HbA1c and high Ht"))
+# ihbac1 = data.columns.get_loc("HbA1C/JDS")
+# ihdl = data.columns.get_loc("HDL-C")
+# ildl = data.columns.get_loc("LDL-C")
+# ihb = data.columns.get_loc("Hb")
+# iht = data.columns.get_loc("Ht")
+# DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ildl] > 160, "High HbA1c and high LDL-C"))
+# DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ihdl] < 40, "High HbA1c and low HDL-C"))
+# DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ihb] > 8, "High HbA1c and high Hb"))
+# DSC.model.add_rule(DSRule(lambda x: x[ihbac1] > 7 and x[ildl] > 38, "High HbA1c and high Ht"))
+
+# Generated 2-attr rules
+ranges = [
+    [4000, 10000, "WBC"],
+    [12, np.nan, "Hb"],
+    [38, 50, "Ht"],
+    [88, 102, "MCV"],
+    [27, 32, "MCH"],
+    [30, 35, "MCHC"],
+    [10, 40, "PLT"],
+    [2, 7, "UA"],
+    [np.nan, 120, "LDL-C"],
+    [0.5, 1.2, "CREA"],
+    [np.nan, 100, "TG"],
+    [40, 60, "HDL-C"],
+    [np.nan, 30, "GOT"],
+    [np.nan, 30, "GPT"],
+    [200, 1400, "ALP"],
+    [np.nan, 30, "GGT"],
+    [70, 100, "blood_glucose"],
+    [np.nan, 7, "HbA1C/JDS"],
+    [18, 28, "bmis"],
+]
+
+DSC.model.generate_outside_range_pair_rules(data.columns[:-1], ranges)
 
 losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=False, add_mult_rules=False, print_every_epochs=1)
 y_pred = DSC.predict(X_test)
