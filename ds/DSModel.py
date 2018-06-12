@@ -276,13 +276,13 @@ class DSModel(nn.Module):
                 hj = ranges[index_j][1]
                 # Add Rules
                 if not np.isnan(li) and not np.isnan(lj):
-                    self.add_rule(lambda x, i=i, j=j: x[i] < li and x[j] < lj, "Low %s and Low %s" % (col_i, col_j))
+                    self.add_rule(DSRule(lambda x, i=i, j=j: x[i] < li and x[j] < lj, "Low %s and Low %s" % (col_i, col_j)))
                 if not np.isnan(hi) and not np.isnan(lj):
-                    self.add_rule(lambda x, i=i, j=j: x[i] > hi and x[j] < lj, "High %s and Low %s" % (col_i, col_j))
+                    self.add_rule(DSRule(lambda x, i=i, j=j: x[i] > hi and x[j] < lj, "High %s and Low %s" % (col_i, col_j)))
                 if not np.isnan(hi) and not np.isnan(hj):
-                    self.add_rule(lambda x, i=i, j=j: x[i] > hi and x[j] > hj, "High %s and High %s" % (col_i, col_j))
+                    self.add_rule(DSRule(lambda x, i=i, j=j: x[i] > hi and x[j] > hj, "High %s and High %s" % (col_i, col_j)))
                 if not np.isnan(li) and not np.isnan(hj):
-                    self.add_rule(lambda x, i=i, j=j: x[i] < li and x[j] > hj, "Low %s and High %s" % (col_i, col_j))
+                    self.add_rule(DSRule(lambda x, i=i, j=j: x[i] < li and x[j] > hj, "Low %s and High %s" % (col_i, col_j)))
 
     def load_rules_bin(self, filename):
         """
