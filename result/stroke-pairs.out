@@ -1,0 +1,176 @@
+Processing epoch 1
+Processing epoch 2
+Processing epoch 3
+Processing epoch 4
+Processing epoch 5
+Processing epoch 6
+Processing epoch 7
+Processing epoch 8
+Processing epoch 9
+Processing epoch 10
+Processing epoch 11
+Processing epoch 12
+Processing epoch 13
+Processing epoch 14
+Processing epoch 15
+Processing epoch 16
+Processing epoch 17
+
+Training time: 9729.31s, epochs: 16
+
+Least training loss reached: 2.591
+
+Training Time: 9729.3
+Epochs: 16
+Total Rules: 550
+Min Loss: 2.591
+Accuracy: 65.7%
+Confusion Matrix:
+[[2297  950]
+ [ 535  543]]
+AUC score: 0.656
+Most important rules
+
+ For class No Stroke
+  Rule 53: GOT > 100.000 (0.464)
+	 A: 0.464	 B: 0.000	A,B: 0.536
+  Rule 21: WBC > 10000.000 (0.442)
+	 A: 0.442	 B: 0.000	A,B: 0.558
+  Rule 59: ALP > 1400.000 (0.439)
+	 A: 0.439	 B: 0.000	A,B: 0.561
+  Rule 92: Women: 14.000 < body_fat < 24.000 (0.399)
+	 A: 0.399	 B: 0.000	A,B: 0.601
+  Rule 89: Men: 8.000 < body_fat < 20.000 (0.395)
+	 A: 0.395	 B: 0.000	A,B: 0.605
+  Rule 94: Men: waist_measurements < 102.000 (0.392)
+	 A: 0.392	 B: 0.000	A,B: 0.608
+  Rule 56: GPT > 100.000 (0.384)
+	 A: 0.384	 B: 0.000	A,B: 0.616
+  Rule 381: <function <lambda> at 0x7f02ae822de8> (0.364)
+	 A: 0.364	 B: 0.000	A,B: 0.636
+  Rule 93: Women: body_fat > 24.000 (0.359)
+	 A: 0.359	 B: 0.000	A,B: 0.641
+  Rule 90: Men: body_fat > 20.000 (0.344)
+	 A: 0.344	 B: 0.000	A,B: 0.656
+  Rule 101: <function <lambda> at 0x7f02ae80f758> (0.336)
+	 A: 0.336	 B: 0.000	A,B: 0.664
+  Rule 416: <function <lambda> at 0x7f02ae825ed8> (0.329)
+	 A: 0.329	 B: 0.000	A,B: 0.671
+  Rule 17: occult_blood_reaction = 3.0 (0.319)
+	 A: 0.319	 B: 0.000	A,B: 0.681
+  Rule 74: 25.000 < bmis < 30.000 (0.314)
+	 A: 0.314	 B: 0.000	A,B: 0.686
+  Rule 75: 30.000 < bmis < 35.000 (0.304)
+	 A: 0.304	 B: 0.000	A,B: 0.696
+  Rule 12: sugar_qualitative = 4.0 (0.296)
+	 A: 0.296	 B: 0.000	A,B: 0.704
+  Rule 27: MCH < 27.000 (0.296)
+	 A: 0.296	 B: 0.000	A,B: 0.704
+  Rule 73: 18.000 < bmis < 25.000 (0.296)
+	 A: 0.296	 B: 0.000	A,B: 0.704
+  Rule 88: Men: body_fat < 8.000 (0.290)
+	 A: 0.290	 B: 0.000	A,B: 0.710
+  Rule 76: 35.000 < bmis < 40.000 (0.279)
+	 A: 0.279	 B: 0.000	A,B: 0.721
+  Rule 62: GGT > 100.000 (0.279)
+	 A: 0.279	 B: 0.000	A,B: 0.721
+  Rule 133: <function <lambda> at 0x7f02ae8126e0> (0.278)
+	 A: 0.285	 B: 0.005	A,B: 0.711
+  Rule 444: <function <lambda> at 0x7f02ae828c80> (0.262)
+	 A: 0.262	 B: 0.000	A,B: 0.738
+  Rule 261: <function <lambda> at 0x7f02ae81d500> (0.261)
+	 A: 0.267	 B: 0.005	A,B: 0.728
+  Rule 439: <function <lambda> at 0x7f02ae828a28> (0.257)
+	 A: 0.257	 B: 0.000	A,B: 0.743
+  Rule 491: <function <lambda> at 0x7f02ae82d398> (0.252)
+	 A: 0.252	 B: 0.000	A,B: 0.748
+  Rule 91: Women: body_fat < 14.000 (0.249)
+	 A: 0.249	 B: 0.000	A,B: 0.751
+  Rule 26: MCV > 102.000 (0.245)
+	 A: 0.245	 B: 0.000	A,B: 0.755
+  Rule 204: <function <lambda> at 0x7f02ae818938> (0.242)
+	 A: 0.242	 B: 0.000	A,B: 0.758
+  Rule 449: <function <lambda> at 0x7f02ae828ed8> (0.236)
+	 A: 0.236	 B: 0.000	A,B: 0.764
+  Rule 506: <function <lambda> at 0x7f02ae82daa0> (0.236)
+	 A: 0.236	 B: 0.000	A,B: 0.764
+  Rule 245: <function <lambda> at 0x7f02ae81bcf8> (0.222)
+	 A: 0.224	 B: 0.002	A,B: 0.774
+  Rule 436: <function <lambda> at 0x7f02ae8288c0> (0.220)
+	 A: 0.220	 B: 0.000	A,B: 0.780
+  Rule 58: 200.000 < ALP < 1400.000 (0.214)
+	 A: 0.219	 B: 0.004	A,B: 0.777
+  Rule 440: <function <lambda> at 0x7f02ae828aa0> (0.212)
+	 A: 0.217	 B: 0.005	A,B: 0.779
+  Rule 372: <function <lambda> at 0x7f02ae8229b0> (0.211)
+	 A: 0.219	 B: 0.008	A,B: 0.773
+  Rule 80: Men: Hb < 7.000 (0.202)
+	 A: 0.202	 B: 0.000	A,B: 0.798
+
+ For class Stroke
+  Rule 32: MCHC > 35.000 (0.469)
+	 A: 0.000	 B: 0.469	A,B: 0.531
+  Rule 10: sugar_qualitative = 2.0 (0.364)
+	 A: 0.000	 B: 0.364	A,B: 0.636
+  Rule 549: <function <lambda> at 0x7f02ae830f50> (0.354)
+	 A: 0.000	 B: 0.354	A,B: 0.646
+  Rule 11: sugar_qualitative = 3.0 (0.342)
+	 A: 0.000	 B: 0.342	A,B: 0.658
+  Rule 77: bmis > 40.000 (0.339)
+	 A: 0.000	 B: 0.339	A,B: 0.661
+  Rule 71: HbA1C/JDS > 11.000 (0.330)
+	 A: 0.000	 B: 0.330	A,B: 0.670
+  Rule 434: <function <lambda> at 0x7f02ae8287d0> (0.324)
+	 A: 0.000	 B: 0.324	A,B: 0.676
+  Rule 457: <function <lambda> at 0x7f02ae82a320> (0.320)
+	 A: 0.000	 B: 0.320	A,B: 0.680
+  Rule 18: occult_blood_reaction = 4.0 (0.311)
+	 A: 0.000	 B: 0.311	A,B: 0.689
+  Rule 463: <function <lambda> at 0x7f02ae82a5f0> (0.287)
+	 A: 0.011	 B: 0.303	A,B: 0.686
+  Rule 67: HbA1C/JDS < 6.000 (0.278)
+	 A: 0.000	 B: 0.278	A,B: 0.722
+  Rule 22: Ht < 38.000 (0.272)
+	 A: 0.000	 B: 0.272	A,B: 0.728
+  Rule 97: Women: waist_measurements > 88.000 (0.265)
+	 A: 0.000	 B: 0.265	A,B: 0.735
+  Rule 455: <function <lambda> at 0x7f02ae82a230> (0.264)
+	 A: 0.000	 B: 0.264	A,B: 0.736
+  Rule 102: <function <lambda> at 0x7f02ae80f7d0> (0.256)
+	 A: 0.000	 B: 0.256	A,B: 0.744
+  Rule 44: CREA > 1.200 (0.255)
+	 A: 0.000	 B: 0.255	A,B: 0.745
+  Rule 401: <function <lambda> at 0x7f02ae8257d0> (0.243)
+	 A: 0.000	 B: 0.243	A,B: 0.756
+  Rule 382: <function <lambda> at 0x7f02ae822e60> (0.242)
+	 A: 0.000	 B: 0.242	A,B: 0.758
+  Rule 47: TG > 200.000 (0.242)
+	 A: 0.000	 B: 0.242	A,B: 0.758
+  Rule 25: 88.000 < MCV < 102.000 (0.239)
+	 A: 0.001	 B: 0.240	A,B: 0.759
+  Rule 95: Men: waist_measurements > 102.000 (0.235)
+	 A: 0.000	 B: 0.235	A,B: 0.765
+  Rule 87: Women: Hb > 12.000 (0.229)
+	 A: 0.000	 B: 0.229	A,B: 0.771
+  Rule 106: <function <lambda> at 0x7f02ae80f9b0> (0.225)
+	 A: 0.001	 B: 0.226	A,B: 0.773
+  Rule 15: occult_blood_reaction = 1.0 (0.224)
+	 A: 0.003	 B: 0.227	A,B: 0.770
+  Rule 392: <function <lambda> at 0x7f02ae825398> (0.224)
+	 A: 0.000	 B: 0.224	A,B: 0.776
+  Rule 281: <function <lambda> at 0x7f02ae81dd70> (0.219)
+	 A: 0.000	 B: 0.220	A,B: 0.780
+  Rule 78: age < 80.000 (0.218)
+	 A: 0.000	 B: 0.219	A,B: 0.781
+  Rule 375: <function <lambda> at 0x7f02ae822b18> (0.218)
+	 A: 0.000	 B: 0.218	A,B: 0.782
+  Rule 346: <function <lambda> at 0x7f02ae820cf8> (0.214)
+	 A: 0.001	 B: 0.214	A,B: 0.785
+  Rule 469: <function <lambda> at 0x7f02ae82a8c0> (0.208)
+	 A: 0.000	 B: 0.208	A,B: 0.792
+  Rule 507: <function <lambda> at 0x7f02ae82db18> (0.206)
+	 A: 0.005	 B: 0.211	A,B: 0.783
+  Rule 127: <function <lambda> at 0x7f02ae812410> (0.206)
+	 A: 0.002	 B: 0.207	A,B: 0.791
+  Rule 109: <function <lambda> at 0x7f02ae80fb18> (0.205)
+	 A: 0.000	 B: 0.205	A,B: 0.795

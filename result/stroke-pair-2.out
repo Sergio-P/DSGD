@@ -1,0 +1,185 @@
+Processing epoch 1
+Processing epoch 2
+Processing epoch 3
+Processing epoch 4
+Processing epoch 5
+Processing epoch 6
+Processing epoch 7
+Processing epoch 8
+Processing epoch 9
+Processing epoch 10
+Processing epoch 11
+Processing epoch 12
+Processing epoch 13
+Processing epoch 14
+Processing epoch 15
+Processing epoch 16
+Processing epoch 17
+Processing epoch 18
+Processing epoch 19
+Processing epoch 20
+Processing epoch 21
+Processing epoch 22
+
+Training time: 12738.58s, epochs: 21
+
+Least training loss reached: 2.590
+
+Training Time: 12738.6
+Epochs: 21
+Total Rules: 550
+Min Loss: 2.590
+Accuracy: 63.9%
+Confusion Matrix:
+[[2151 1087]
+ [ 475  612]]
+AUC score: 0.665
+Most important rules
+
+ For class No Stroke
+  Rule 76: 35.000 < bmis < 40.000 (0.535)
+	 A: 0.535	 B: 0.000	A,B: 0.465
+  Rule 73: 18.000 < bmis < 25.000 (0.518)
+	 A: 0.518	 B: 0.000	A,B: 0.482
+  Rule 75: 30.000 < bmis < 35.000 (0.514)
+	 A: 0.514	 B: 0.000	A,B: 0.486
+  Rule 101: High WBC and Low Ht (0.504)
+	 A: 0.504	 B: 0.000	A,B: 0.496
+  Rule 53: GOT > 100.000 (0.479)
+	 A: 0.479	 B: 0.000	A,B: 0.521
+  Rule 90: Men: body_fat > 20.000 (0.475)
+	 A: 0.475	 B: 0.000	A,B: 0.525
+  Rule 93: Women: body_fat > 24.000 (0.468)
+	 A: 0.468	 B: 0.000	A,B: 0.532
+  Rule 92: Women: 14.000 < body_fat < 24.000 (0.443)
+	 A: 0.443	 B: 0.000	A,B: 0.557
+  Rule 465: High CREA and High GGT (0.442)
+	 A: 0.442	 B: 0.000	A,B: 0.558
+  Rule 59: ALP > 1400.000 (0.420)
+	 A: 0.420	 B: 0.000	A,B: 0.580
+  Rule 35: PLT > 40.000 (0.377)
+	 A: 0.377	 B: 0.000	A,B: 0.623
+  Rule 91: Women: body_fat < 14.000 (0.369)
+	 A: 0.369	 B: 0.000	A,B: 0.631
+  Rule 96: Women: waist_measurements < 88.000 (0.365)
+	 A: 0.365	 B: 0.000	A,B: 0.635
+  Rule 56: GPT > 100.000 (0.363)
+	 A: 0.363	 B: 0.000	A,B: 0.637
+  Rule 21: WBC > 10000.000 (0.360)
+	 A: 0.360	 B: 0.000	A,B: 0.640
+  Rule 74: 25.000 < bmis < 30.000 (0.355)
+	 A: 0.355	 B: 0.000	A,B: 0.645
+  Rule 89: Men: 8.000 < body_fat < 20.000 (0.353)
+	 A: 0.353	 B: 0.000	A,B: 0.647
+  Rule 26: MCV > 102.000 (0.346)
+	 A: 0.346	 B: 0.000	A,B: 0.654
+  Rule 2: protein_qualitative = 0.5 (0.344)
+	 A: 0.344	 B: 0.000	A,B: 0.656
+  Rule 449: High LDL-C and Low bmis (0.338)
+	 A: 0.338	 B: 0.000	A,B: 0.662
+  Rule 261: High MCV and Low HDL-C (0.307)
+	 A: 0.323	 B: 0.011	A,B: 0.665
+  Rule 88: Men: body_fat < 8.000 (0.303)
+	 A: 0.303	 B: 0.000	A,B: 0.697
+  Rule 487: High TG and Low bmis (0.303)
+	 A: 0.303	 B: 0.000	A,B: 0.697
+  Rule 5: protein_qualitative = 3.0 (0.294)
+	 A: 0.294	 B: 0.000	A,B: 0.706
+  Rule 345: High MCHC and Low HDL-C (0.288)
+	 A: 0.304	 B: 0.011	A,B: 0.685
+  Rule 439: High LDL-C and Low HDL-C (0.284)
+	 A: 0.284	 B: 0.000	A,B: 0.716
+  Rule 541: High GGT and Low bmis (0.283)
+	 A: 0.283	 B: 0.000	A,B: 0.717
+  Rule 459: High CREA and High GPT (0.271)
+	 A: 0.271	 B: 0.000	A,B: 0.729
+  Rule 28: 27.000 < MCH < 32.000 (0.256)
+	 A: 0.256	 B: 0.000	A,B: 0.744
+  Rule 133: High WBC and Low HDL-C (0.245)
+	 A: 0.259	 B: 0.011	A,B: 0.730
+  Rule 296: High MCH and High LDL-C (0.239)
+	 A: 0.239	 B: 0.000	A,B: 0.761
+  Rule 336: High MCHC and High LDL-C (0.237)
+	 A: 0.237	 B: 0.000	A,B: 0.763
+  Rule 372: High PLT and High LDL-C (0.230)
+	 A: 0.239	 B: 0.008	A,B: 0.753
+  Rule 457: High CREA and High GOT (0.226)
+	 A: 0.226	 B: 0.000	A,B: 0.774
+  Rule 444: High LDL-C and High ALP (0.224)
+	 A: 0.224	 B: 0.000	A,B: 0.776
+  Rule 197: High Ht and Low PLT (0.223)
+	 A: 0.227	 B: 0.004	A,B: 0.768
+  Rule 477: High TG and Low HDL-C (0.222)
+	 A: 0.222	 B: 0.000	A,B: 0.778
+  Rule 416: High UA and High GOT (0.216)
+	 A: 0.216	 B: 0.000	A,B: 0.784
+  Rule 142: High WBC and High ALP (0.213)
+	 A: 0.213	 B: 0.000	A,B: 0.787
+  Rule 410: High UA and High TG (0.210)
+	 A: 0.220	 B: 0.009	A,B: 0.771
+  Rule 354: High MCHC and High ALP (0.206)
+	 A: 0.206	 B: 0.000	A,B: 0.794
+  Rule 245: High MCV and Low PLT (0.206)
+	 A: 0.211	 B: 0.004	A,B: 0.785
+  Rule 438: High LDL-C and High TG (0.205)
+	 A: 0.212	 B: 0.006	A,B: 0.782
+  Rule 479: High TG and High GOT (0.203)
+	 A: 0.205	 B: 0.002	A,B: 0.792
+  Rule 440: High LDL-C and High HDL-C (0.202)
+	 A: 0.213	 B: 0.011	A,B: 0.775
+
+ For class Stroke
+  Rule 32: MCHC > 35.000 (0.459)
+	 A: 0.000	 B: 0.459	A,B: 0.541
+  Rule 9: sugar_qualitative = 1.0 (0.448)
+	 A: 0.000	 B: 0.448	A,B: 0.552
+  Rule 10: sugar_qualitative = 2.0 (0.431)
+	 A: 0.000	 B: 0.431	A,B: 0.569
+  Rule 11: sugar_qualitative = 3.0 (0.400)
+	 A: 0.000	 B: 0.400	A,B: 0.600
+  Rule 29: MCH > 32.000 (0.377)
+	 A: 0.000	 B: 0.377	A,B: 0.623
+  Rule 66: blood_glucose > 200.000 (0.369)
+	 A: 0.000	 B: 0.369	A,B: 0.631
+  Rule 67: HbA1C/JDS < 6.000 (0.333)
+	 A: 0.000	 B: 0.333	A,B: 0.667
+  Rule 549: High HbA1C/JDS and Low bmis (0.321)
+	 A: 0.000	 B: 0.321	A,B: 0.679
+  Rule 434: High UA and High bmis (0.316)
+	 A: 0.000	 B: 0.316	A,B: 0.684
+  Rule 62: GGT > 100.000 (0.289)
+	 A: 0.000	 B: 0.289	A,B: 0.711
+  Rule 18: occult_blood_reaction = 4.0 (0.286)
+	 A: 0.000	 B: 0.286	A,B: 0.714
+  Rule 6: protein_qualitative = 4.0 (0.263)
+	 A: 0.000	 B: 0.263	A,B: 0.737
+  Rule 95: Men: waist_measurements > 102.000 (0.256)
+	 A: 0.000	 B: 0.256	A,B: 0.744
+  Rule 189: High Ht and Low MCH (0.254)
+	 A: 0.000	 B: 0.254	A,B: 0.746
+  Rule 237: High MCV and Low MCH (0.250)
+	 A: 0.000	 B: 0.250	A,B: 0.750
+  Rule 433: High UA and Low bmis (0.249)
+	 A: 0.000	 B: 0.249	A,B: 0.751
+  Rule 87: Women: Hb > 12.000 (0.249)
+	 A: 0.000	 B: 0.249	A,B: 0.751
+  Rule 24: MCV < 88.000 (0.244)
+	 A: 0.000	 B: 0.244	A,B: 0.756
+  Rule 19: WBC < 4000.000 (0.242)
+	 A: 0.000	 B: 0.242	A,B: 0.758
+  Rule 34: 10.000 < PLT < 40.000 (0.239)
+	 A: 0.000	 B: 0.239	A,B: 0.761
+  Rule 20: 4000.000 < WBC < 10000.000 (0.232)
+	 A: 0.000	 B: 0.232	A,B: 0.768
+  Rule 520: High GPT and High GGT (0.219)
+	 A: 0.000	 B: 0.219	A,B: 0.781
+  Rule 365: High MCHC and Low bmis (0.208)
+	 A: 0.000	 B: 0.208	A,B: 0.792
+  Rule 68: 6.000 < HbA1C/JDS < 7.000 (0.207)
+	 A: 0.013	 B: 0.220	A,B: 0.767
+  Rule 109: High WBC and Low MCH (0.204)
+	 A: 0.000	 B: 0.204	A,B: 0.796
+  Rule 97: Women: waist_measurements > 88.000 (0.203)
+	 A: 0.000	 B: 0.203	A,B: 0.797
+  Rule 69: 7.000 < HbA1C/JDS < 9.000 (0.202)
+	 A: 0.013	 B: 0.215	A,B: 0.773
