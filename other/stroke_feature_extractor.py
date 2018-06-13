@@ -68,8 +68,8 @@ def process_patient(df, con, pid):
 
     features = {}
 
-    for code in HISTORY_DISEASES:
-        features[code] = 0
+    for name, code in HISTORY_DISEASES:
+        features[name] = 0
 
     for index, event in data.iterrows():
         if event.exam_item_code is not None and not np.isnan(event.exam_result) and event.exam_item_code not in features:
