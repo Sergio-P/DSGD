@@ -1,11 +1,15 @@
 import sys
 import json
+import re
+import numpy as np
 import pandas as pd
 import datetime
 from sshtunnel import SSHTunnelForwarder
 from sqlalchemy import create_engine
 
 NUM_YEARS = 2
+HISTORY_DISEASES = [("HD_diabetes", "^E11.*$"), ("HD_cerebrovascullar", "^I6.*$"), ("HD_cardiovascullar", "^I2[0-5].*$"),
+                    ("HD_arteries", "^I7.*$")]
 
 
 def sub_years(date, num):
@@ -18,7 +22,8 @@ def get_attribute_columns():
     # And appending pid, age, gender, and cls
     return ["pid", "age", "gender", "303", "304", "301", "300", "306", "00454", "00301", "00051", "00503", "02690",
             "00460", "00302", "00303", "00304", "00305", "00306", "00307", "00308", "00407", "00413", "00481", "00482",
-            "00055", "00063", "00483", "00484", "00410", "03317", "cls"]
+            "00055", "00063", "00483", "00484", "00410", "03317", "HD_diabetes", "HD_cerebrovascullar",
+            "HD_cardiovascullar", "HD_arteries", "cls"]
 
 
 def add_patient_vector(df, pid, age, gender, cls, feature_dict):
@@ -59,13 +64,20 @@ def process_patient(df, con, pid):
         data = data[(data.event_date > sub_years(data.iloc[0].event_date, NUM_YEARS))]
         age = data.iloc[0].event_date.year - byear
 
-    data = data.dropna(subset=["exam_item_code", "exam_result"])
+    # data = data.dropna(subset=["exam_item_code", "exam_result"])
 
     features = {}
 
+    for code in HISTORY_DISEASES:
+        features[code] = 0
+
     for index, event in data.iterrows():
-        if event.exam_item_code not in features:
+        if event.exam_item_code is not None and not np.isnan(event.exam_result) and event.exam_item_code not in features:
             features[event.exam_item_code] = event.exam_result
+        if event.icd10 is not None:
+            for name, code in HISTORY_DISEASES:
+                if re.match(code, event.icd10):
+                    features[name] = 1
 
     return add_patient_vector(df, pid, age, gender, cls, features)
 
@@ -104,5 +116,5 @@ def main(out_file):
 
 
 if __name__ == '__main__':
-    out_file = "stroke_data.csv" if len(sys.argv) == 1 else sys.argv[1]
+    out_file = "stroke_data_2.csv" if len(sys.argv) == 1 else sys.argv[1]
     main(out_file)
