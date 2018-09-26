@@ -30,17 +30,16 @@ data = data.sample(frac=1).reset_index(drop=True)
 
 cut = int(0.7*len(data))
 
-X_train = data.iloc[:cut, :-1].as_matrix()
-y_train = data.iloc[:cut, -1].as_matrix()
-X_test = data.iloc[cut:, :-1].as_matrix()
-y_test = data.iloc[cut:, -1].as_matrix()
+X_train = data.iloc[:cut, :-1].values
+y_train = data.iloc[:cut, -1].values
+X_test = data.iloc[cut:, :-1].values
+y_test = data.iloc[cut:, -1].values
 
 DSC = DSClassifier(max_iter=200, debug_mode=True)
 losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1)
 y_pred = DSC.predict(X_test)
-print "Total Rules: %d" % DSC.model.get_rules_size()
-print "\nAccuracy: %.1f%%" % (accuracy_score(y_test, y_pred) * 100.)
-print "Confusion Matrix:"
-print confusion_matrix(y_test, y_pred)
-
-print DSC.model.find_most_important_rules(class_names=["0", "1"])
+print("Total Rules: %d" % DSC.model.get_rules_size())
+print("\nAccuracy: %.1f%%" % (accuracy_score(y_test, y_pred) * 100.))
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print(DSC.model.find_most_important_rules(class_names=["0", "1"]))

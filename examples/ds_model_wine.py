@@ -48,7 +48,7 @@ yt = Variable(torch.Tensor(y_train).long())
 # yt = Variable(torch.cat([yt == 0, yt == 1], 1).float())
 
 for epoch in range(10):
-    print "Processing epoch %d" % (epoch + 1)
+    print("Processing epoch %d" % (epoch + 1))
     y_pred = model.forward(Xt)
     loss = criterion(y_pred, yt)
     optimizer.zero_grad()
@@ -59,22 +59,22 @@ for epoch in range(10):
     if epoch > 2 and abs(losses[-2] - loss.data.item()) < 0.001:
         break
 
-print "Training time: %.2fs, epochs: %d" % (time.time() - ti, epoch)
-print "Least training loss reached: %.3f" % losses[-1]
+print("Training time: %.2fs, epochs: %d" % (time.time() - ti, epoch))
+print("Least training loss reached: %.3f" % losses[-1])
 model.eval()
-# print model
+# print(model
 
 # TESTING
 with torch.no_grad():
-    print model.find_most_important_rules()
+    print(model.find_most_important_rules())
     Xt = torch.Tensor(X_test)
     Yt = torch.Tensor(y_test).long().numpy()
     _, yt_pred = torch.max(model(Xt), 1)
     yt_pred = yt_pred.numpy()
     accuracy = accuracy_score(Yt, yt_pred)
-    print "Accuracy in test: %.1f%%" % (accuracy * 100)
-    print "Confusion Matrix"
-    print confusion_matrix(Yt, yt_pred)
+    print("Accuracy in test: %.1f%%" % (accuracy * 100))
+    print("Confusion Matrix")
+    print(confusion_matrix(Yt, yt_pred))
 
 
 plt.plot(range(len(losses)), losses)

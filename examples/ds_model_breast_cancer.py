@@ -14,10 +14,10 @@ data = data.sample(frac=1).reset_index(drop=True)
 
 cut = int(0.7*len(data))
 
-X_train = data.iloc[:cut, :-1].as_matrix()
-y_train = data.iloc[:cut, -1].as_matrix()
-X_test = data.iloc[cut:, :-1].as_matrix()
-y_test = data.iloc[cut:, -1].as_matrix()
+X_train = data.iloc[:cut, :-1].values
+y_train = data.iloc[:cut, -1].values
+X_test = data.iloc[cut:, :-1].values
+y_test = data.iloc[cut:, -1].values
 
 
 DSC = DSClassifier(max_iter=200, debug_mode=True)
@@ -26,12 +26,12 @@ losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rule
 y_pred = DSC.predict(X_test)
 y_score = DSC.predict_proba(X_test)
 
-print "\nTraining Time: %.1f" % dt
-print "Epochs: %d" % epoch
-print "Min Loss: %.1f" % losses[-1]
-print "Accuracy: %.1f%%" % (accuracy_score(y_test, y_pred) * 100.)
-print "Confusion Matrix:"
-print confusion_matrix(y_test, y_pred)
-print "AUC score: %.3f" % (roc_auc_score(y_test, y_score))
+print("\nTraining Time: %.1f" % dt)
+print("Epochs: %d" % epoch)
+print("Min Loss: %.1f" % losses[-1])
+print("Accuracy: %.1f%%" % (accuracy_score(y_test, y_pred) * 100.))
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("AUC score: %.3f" % (roc_auc_score(y_test, y_score)))
 
-print DSC.model.find_most_important_rules(threshold=0.32, class_names=["Benign", "Malignant"])
+print(DSC.model.find_most_important_rules(threshold=0.32, class_names=["Benign", "Malignant"]))

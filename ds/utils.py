@@ -4,14 +4,14 @@ from sklearn.cluster import KMeans
 
 def natural_breaks(data, k=5, append_infinity=False):
     km = KMeans(n_clusters=k, max_iter=150, n_init=5)
-    data = map(lambda (x): [x], data)
+    data = map(lambda x: [x], data)
     km.fit(data)
     breaks = []
     if append_infinity:
         breaks.append(float("-inf"))
         breaks.append(float("inf"))
     for i in range(k):
-        breaks.append(max(map(lambda (x): x[0], filter(lambda (x): km.predict(x) == i, data))))
+        breaks.append(max(map(lambda x: x[0], filter(lambda x: km.predict(x) == i, data))))
     breaks.sort()
     return breaks
 
@@ -38,3 +38,10 @@ def normalize(a, b, c):
     c = 0 if c < 0 else 1 if c > 1 else c
     n = float(a + b + c)
     return a/n, b/n, c/n
+
+
+def one_hot(n, k):
+    a = np.zeros((len(n), k))
+    for i in range(len(n)):
+        a[i, int(n[i])] = 1
+    return a

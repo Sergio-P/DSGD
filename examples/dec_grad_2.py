@@ -18,10 +18,10 @@ def print_maf():
     b.append(w2)
     ab.append(we)
     # print "phi\t %.3f" % 0.
-    print " A\t %.3f" % w1
-    print " B\t %.3f" % w2
-    print "A,B\t %.3f" % we
-    print "-" * 11
+    print(" A\t %.3f" % w1)
+    print(" B\t %.3f" % w2)
+    print("A,B\t %.3f" % we)
+    print("-" * 11)
 
 
 def normalize(a, b, c):
@@ -63,7 +63,7 @@ while abs(last_J - J) > 0.0005:
     i += 1
     alpha *= .95
 
-print "Iters: %d" % i
+print("Iters: %d" % i)
 
 plt.subplot(121)
 plt.plot(np.arange(len(a)), a, label="A")

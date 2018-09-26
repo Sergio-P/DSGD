@@ -46,7 +46,7 @@ def process_patient(df, con, pid):
     cls = 0
 
     if len(data) == 0:
-        print "Error in patient %s" % pid
+        print("Error in patient %s" % pid)
         return df
 
     if len(birth_event) > 0:
@@ -103,7 +103,7 @@ def main(out_file):
         i = 1
         n = len(patients)
         for index, patient in patients.iterrows():
-            print ("\r[%d%%] Processing patient %d of %d" % (100*i/n, i, n)),
+            print("\r[%d%%] Processing patient %d of %d" % (100*i/n, i, n), end="")
             sys.stdout.flush()
             pid = patient.patient_id
             df = process_patient(df, conn_event, pid)
@@ -111,8 +111,8 @@ def main(out_file):
 
         df.to_csv(out_file)
 
-        print "-" * 60
-        print df
+        print("-" * 60)
+        print(df)
 
 
 if __name__ == '__main__':

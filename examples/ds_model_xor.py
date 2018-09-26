@@ -25,7 +25,7 @@ lbls = []
 lss = []
 
 for use_proper_rules in [False, True]:
-    print "\n" + "-" * 40 + "\n"
+    print("\n" + "-" * 40 + "\n")
     model = DSModel()
     if use_proper_rules:
         model.add_rule(DSRule(lambda x: x[0] * x[1] > 0, "Positive multiplication"))
@@ -40,7 +40,7 @@ for use_proper_rules in [False, True]:
 
     losses = []
 
-    print model
+    print(model)
 
     ti = time.time()
     model.train()
@@ -62,14 +62,14 @@ for use_proper_rules in [False, True]:
         if epoch > 2 and abs(losses[-2] - loss.data.item()) < 0.001:
             break
 
-    print "Training time: %.2fs, epochs: %d" % (time.time() - ti, epoch)
-    print "Least training loss reached: %.3f" % losses[-1]
+    print("Training time: %.2fs, epochs: %d" % (time.time() - ti, epoch))
+    print("Least training loss reached: %.3f" % losses[-1])
     model.eval()
 
     # TESTING
     with torch.no_grad():
-        print model
-        print model.find_most_important_rules()
+        print(model)
+        print(model.find_most_important_rules())
         Xt = torch.Tensor(X_test)
         Yt = torch.Tensor(y_test).long().numpy()
         _, yt_pred = torch.max(model(Xt), 1)
@@ -78,9 +78,9 @@ for use_proper_rules in [False, True]:
         accuracy = accuracy_score(Yt, yt_pred)
         accs.append(accuracy)
         lss.append(losses)
-        print "Accuracy in test: %.1f%%" % (accuracy * 100)
-        print "Confusion Matrix"
-        print confusion_matrix(Yt, yt_pred)
+        print("Accuracy in test: %.1f%%" % (accuracy * 100))
+        print("Confusion Matrix")
+        print(confusion_matrix(Yt, yt_pred))
 
 
 plt.figure(figsize=(7,6))

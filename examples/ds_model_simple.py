@@ -27,7 +27,7 @@ Y = torch.cat([Yn == 0, Yn == 1], 1).long()
 y = Variable(Yn.view(SIZE).long())
 X = Variable(X)
 
-print model
+print(model)
 
 ti = time.time()
 model.train()
@@ -44,9 +44,9 @@ for epoch in range(1000):
     if epoch > 3 and abs(losses[-3] - loss.data.item()) < 0.001:
         break
 
-print "Training time: %.3fs, epochs: %d" % (time.time() - ti, epoch)
+print("Training time: %.3fs, epochs: %d" % (time.time() - ti, epoch))
 model.eval()
-print model
+print(model)
 
 # Testing
 with torch.no_grad():
@@ -55,7 +55,7 @@ with torch.no_grad():
     Yt = ((Xt > -1.2) & (Xt < 1.2)).view(SIZE)
     _, yt_pred = torch.max(model(Xt), 1)
     accuracy = (yt_pred.int() == Yt.int()).sum().item() / float(len(Yt))
-    print "Accuracy in test: %.1f%%" % (accuracy * 100)
+    print("Accuracy in test: %.1f%%" % (accuracy * 100))
 
 plt.plot(range(len(losses)), losses)
 plt.xlabel("Iterations")

@@ -94,16 +94,15 @@ losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=False, add_mult_r
 y_pred = DSC.predict(X_test)
 y_score = DSC.predict_proba(X_test)
 
-print "\nTraining Time: %.1f" % dt
-print "Epochs: %d" % epoch
-print "Total Rules: %d" % DSC.model.get_rules_size()
-print "Min Loss: %.3f" % losses[-1]
-print "Accuracy: %.1f%%" % (accuracy_score(y_test, y_pred) * 100.)
-print "Confusion Matrix:"
-print confusion_matrix(y_test, y_pred)
-print "AUC score: %.3f" % (roc_auc_score(y_test, y_score))
-
-print DSC.model.find_most_important_rules(threshold=0.2, class_names=["No Stroke", "Stroke"])
+print("\nTraining Time: %.1f" % dt)
+print("Epochs: %d" % epoch)
+print("Total Rules: %d" % DSC.model.get_rules_size())
+print("Min Loss: %.3f" % losses[-1])
+print("Accuracy: %.1f%%" % (accuracy_score(y_test, y_pred) * 100.))
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("AUC score: %.3f" % (roc_auc_score(y_test, y_score)))
+print(DSC.model.find_most_important_rules(threshold=0.2, class_names=["No Stroke", "Stroke"]))
 
 # Plotting #
 import numpy as np

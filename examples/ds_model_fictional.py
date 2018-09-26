@@ -11,7 +11,7 @@ N = 1000
 k = 3
 m = 2
 
-print "N,k,m,Ac,mloss,epochs,time,t_forward,t_loss,t_optim,t_norm"
+print("N,k,m,Ac,mloss,epochs,time,t_forward,t_loss,t_optim,t_norm")
 
 if True:
 # for N in np.linspace(50, 3050, 10):
@@ -44,10 +44,10 @@ if True:
     # print "Confusion Matrix"
     # print confusion_matrix(y_test, y_pred)
 
-    print "%d,%d,%d,%f,%f,%d,%f,%f,%f,%f,%f" % (
-    N, k, m, accuracy, losses[-1], epoch, dt, dt_forward, dt_loss, dt_optim, dt_norm)
+    print("%d,%d,%d,%f,%f,%d,%f,%f,%f,%f,%f" % (
+    N, k, m, accuracy, losses[-1], epoch, dt, dt_forward, dt_loss, dt_optim, dt_norm))
 
-    print DSC.model.find_most_important_rules()
+    print(DSC.model.find_most_important_rules())
 
     plt.subplot(121)
     plt.scatter(X_test[:,0], X_test[:,1], c=y_pred)

@@ -8,42 +8,44 @@ from scipy.stats import norm
 from torch.nn import Softmax
 
 from ds.DSRule import DSRule
-from ds.core import dempster_rule_t, create_random_maf
+from ds.core import dempster_rule_kt, create_random_maf_k
 from ds.utils import is_categorical
 
 
-class DSModel(nn.Module):
+class DSModelMulti(nn.Module):
     """
-    Torch module implementation of DS Binary Classifier
+    Torch module implementation of DS General Classification
     """
 
-    def __init__(self, use_softmax=True, skip_dr_norm=False):
+    def __init__(self, k, use_softmax=True, skip_dr_norm=False):
         """
         Creates an empty DS Model
         """
-        super(DSModel, self).__init__()
+        super(DSModelMulti, self).__init__()
         self.masses = []
         self.preds = []
         self.n = 0
+        self.k = k
         self.use_softmax = use_softmax
         self.skip_dr_norm = skip_dr_norm
         if use_softmax:
             self.sm = Softmax(dim=0)
 
-    def add_rule(self, pred, ma=None, mb=None, mab=None):
+    def add_rule(self, pred, m_sing=None, m_uncert=None):
         """
         Adds a rule to the model. If no masses are provided, random masses will be used.
         :param pred: DSRule or lambda or callable, used as the predicate of the rule
-        :param ma: [optional] mass for first element
-        :param mb: [optional] mass for second element
-        :param mab: [optional] mass for uncertainty
+        :param m_sing: [optional] masses for singletons
+        :param m_uncert: [optional] mass for uncertainty
         :return:
         """
         self.preds.append(pred)
         self.n += 1
-        if ma is None or mb is None or mab is None:
-            _, ma, mb, mab = create_random_maf()
-        self.masses.append(Variable(torch.Tensor([[ma], [mb], [mab]]), requires_grad=True))
+        if m_sing is None or m_uncert is None or len(m_sing) != self.k:
+            masses = create_random_maf_k(self.k)
+        else:
+            masses = m_sing + [m_uncert]
+        self.masses.append(Variable(torch.Tensor(masses).view(self.k + 1, 1), requires_grad=True))
 
     def forward(self, X):
         """
@@ -59,13 +61,13 @@ class DSModel(nn.Module):
             else:
                 mf = self.masses[sel[0]]
                 for j in range(1, len(sel)):
-                    mf = dempster_rule_t(mf, self.masses[sel[j]], not self.skip_dr_norm)
+                    mf = dempster_rule_kt(mf, self.masses[sel[j]], not self.skip_dr_norm)
                 if self.use_softmax:
-                    res = self.sm(mf[:2])
+                    res = self.sm(mf[:-1])
                 else:
-                    res = (mf[:2] / torch.sum(mf[:2])).view(2)
+                    res = (mf[:-1] / torch.sum(mf[:-1])).view(self.k)
                 out.append(res)
-        return torch.cat(out).view(len(X), 2)
+        return torch.cat(out).view(len(X), self.k)
 
     def normalize(self):
         """
@@ -95,42 +97,45 @@ class DSModel(nn.Module):
         for i in range(self.n):
             ps = str(self.preds[i])
             ms = self.masses[i]
-            builder += "\nRule %d: %s\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % (i+1, ps, ms[0], ms[1], ms[2])
+            builder += "\nRule %d: %s\n\t" % (i+1, ps)
+            for j in range(len(ms) - 1):
+                builder += "C%d: %.3f\t" % (j+1, ms[j])
+            builder += "Unc: %.3f\n" % ms[self.k]
         return builder[:-1]
 
-    def find_most_important_rules(self, classes=None, threshold=0.2, class_names=None):
-        """
-        Shows the most contributive rules for the classes specified
-        :param classes: Array of classes, by default shows all clases
-        :param threshold: score minimum value considered to be contributive
-        :return: A string containing the information about most important rules
-        """
-        builder = "Most important rules\n"
-        if classes is None:
-            classes = [0, 1]
-
-        if class_names is None:
-            class_names = [str(i) for i in range(2)]
-
-        for cls in classes:
-            builder += "\n For class %s\n" % class_names[cls]
-            found = []
-            for i in range(len(self.masses)):
-                ms = self.masses[i]
-                score = ((.1 + ms[cls]) / (.1 + ms[1 - cls]) - 1) * (1 - ms[-1]) / 10.
-                if score >= threshold * threshold:
-                    ps = str(self.preds[i])
-                    found.append((score, "  Rule %d: %s (%.3f)\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % \
-                                (i + 1, ps, np.sqrt(score.detach().numpy()), ms[0], ms[1], ms[2])))
-
-            found.sort(reverse=True)
-            if len(found) == 0:
-                builder += "   No rules found\n"
-
-            for rule in found:
-                builder += rule[1]
-
-        return builder[:-1]
+    # def find_most_important_rules(self, classes=None, threshold=0.2, class_names=None):
+    #     """
+    #     Shows the most contributive rules for the classes specified
+    #     :param classes: Array of classes, by default shows all clases
+    #     :param threshold: score minimum value considered to be contributive
+    #     :return: A string containing the information about most important rules
+    #     """
+    #     builder = "Most important rules\n"
+    #     if classes is None:
+    #         classes = range(self.k)
+    #
+    #     if class_names is None:
+    #         class_names = [str(i) for i in range(self.k)]
+    #
+    #     for cls in classes:
+    #         builder += "\n For class %s\n" % class_names[cls]
+    #         found = []
+    #         for i in range(len(self.masses)):
+    #             ms = self.masses[i]
+    #             score = (ms[cls]) * (1 - ms[-1])
+    #             if score >= threshold * threshold:
+    #                 ps = str(self.preds[i])
+    #                 found.append((score, "  Rule %d: %s (%.3f)\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % \
+    #                             (i + 1, ps, np.sqrt(score.detach().numpy()), ms[0], ms[1], ms[2])))
+    #
+    #         found.sort(reverse=True)
+    #         if len(found) == 0:
+    #             builder += "   No rules found\n"
+    #
+    #         for rule in found:
+    #             builder += rule[1]
+    #
+    #     return builder[:-1]
 
     def generate_statistic_single_rules(self, X, breaks=2, column_names=None):
         """

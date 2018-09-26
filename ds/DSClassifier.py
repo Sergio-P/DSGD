@@ -124,14 +124,14 @@ class Rule:
         return self.__dict__
 
     def pretty_print(self):
-        print "RULE"
-        print "   * MAF: " + str(self.maf)
-        print "   * Conditions:"
+        print("RULE")
+        print("   * MAF: " + str(self.maf))
+        print("   * Conditions:")
         for cond in self.conditions:
-            print "      * " + str(cond)
+            print("      * " + str(cond))
 
     def print_row(self):
-        print " & ".join(map(str, self.conditions)) + "," + ",".join(map(str, self.maf))
+        print(" & ".join(map(str, self.conditions)) + "," + ",".join(map(str, self.maf)))
 
 
 class Condition:

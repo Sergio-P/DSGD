@@ -24,7 +24,7 @@ if not split_plots:
 
     # title = "%s = %.2f*%s^2 + %.2f*%s + %.2f" % (Y_VAR, z[0], X_VAR, z[1], X_VAR, z[2])
     title = "%s = %.4f*%s + %.2f" % (Y_VAR, z[0], X_VAR, z[1])
-    print title
+    print(title)
 
     z = np.polyfit(df2["N"], df2["time"], 1)
     p = np.poly1d(z)
@@ -34,7 +34,7 @@ if not split_plots:
 
     # title = "%s = %.2f*%s^2 + %.2f*%s + %.2f" % (Y_VAR, z[0], X_VAR, z[1], X_VAR, z[2])
     title = "%s = %.4f*%s + %.2f" % (Y_VAR, z[0], X_VAR, z[1])
-    print title
+    print(title)
 
     plt.title("Time")
 

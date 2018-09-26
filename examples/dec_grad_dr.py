@@ -37,10 +37,10 @@ def print_maf():
     aes.append(ae)
     bes.append(be)
     # print "phi\t %.3f" % 0.
-    print " X\t %.3f \t %.3f" % (ax, bx)
-    print " Y\t %.3f \t %.3f" % (ay, by)
-    print "X,Y\t %.3f \t %.3f" % (ae, be)
-    print "-" * 18
+    print(" X\t %.3f \t %.3f" % (ax, bx))
+    print(" Y\t %.3f \t %.3f" % (ay, by))
+    print("X,Y\t %.3f \t %.3f" % (ae, be))
+    print("-" * 18)
 
 
 alpha = 0.01
@@ -90,7 +90,7 @@ while abs(last_J - J) > MIN_DELTA_J:
     i += 1
     alpha *= .95
 
-print "Iters: %d" % i
+print("Iters: %d" % i)
 
 plt.figure(figsize=(14, 4))
 

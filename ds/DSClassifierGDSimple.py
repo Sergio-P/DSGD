@@ -100,7 +100,7 @@ if __name__ == '__main__':
         if epoch > 3 and abs(losses[-3] - loss.data[0]) < 0.001:
             break
 
-    print "Optimization time: %ds" % (time.time() - ti)
+    print("Optimization time: %ds" % (time.time() - ti))
     model.eval()
     # print "Optimal values for w"
     # print model.m
