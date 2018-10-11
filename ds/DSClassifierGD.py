@@ -61,7 +61,7 @@ class DSClassifier(ClassifierMixin):
             self.model.generate_statistic_single_rules(X, breaks=single_rules_breaks, column_names=column_names)
         if add_mult_rules:
             self.model.generate_mult_pair_rules(X, column_names=column_names)
-
+        # print(self.model.get_rules_size())
         if self.optim == "adam":
             optimizer = torch.optim.Adam(self.model.masses, lr=self.lr)
         elif self.optim == "sgd":
