@@ -150,6 +150,8 @@ class DSModel(nn.Module):
         for i in range(len(mean)):
             if is_categorical(X[:,i]):
                 categories = np.unique(X[:,i][~np.isnan(X[:,i])])
+                if len(categories) <= 1:
+                    continue
                 for cat in categories:
                     self.add_rule(DSRule(lambda x, i=i, k=cat: x[i] == k, "%s = %s" % (column_names[i], str(cat))))
             else:

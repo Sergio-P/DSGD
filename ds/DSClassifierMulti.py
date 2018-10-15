@@ -119,6 +119,7 @@ class DSClassifierMulti(ClassifierMixin):
                         print_partial_time=False, print_every_epochs=None, print_least_loss=True, return_partial_dt=False,
                         disable_all_print=False):
         losses = []
+        print("Optimization started")
 
         if disable_all_print:
             print_every_epochs = None
@@ -152,7 +153,7 @@ class DSClassifierMulti(ClassifierMixin):
         epoch = 0
         for epoch in range(self.max_iter):
             if print_every_epochs is not None and epoch % print_every_epochs == 0:
-                print("Processing epoch %d" % (epoch + 1))
+                print("\rProcessing epoch %d" % (epoch + 1), end="")
             acc_loss = 0
             for Xi, yi in train_loader:
                 tq = time.time()
