@@ -52,6 +52,9 @@ def process_patient(df, con, pid):
     if len(birth_event) > 0:
         byear = birth_event.iloc[0].event_date.year
         gender = birth_event.iloc[0].exam_result
+    else:
+        print("Patient %s has no birth event!" % pid)
+        # return df
 
     stroke_event = data[data.icd10.fillna("").str.contains("^I6[34].*")]
 
@@ -62,7 +65,8 @@ def process_patient(df, con, pid):
         age = se.event_date.year - byear
     else:
         data = data[(data.event_date > sub_years(data.iloc[0].event_date, NUM_YEARS))]
-        age = data.iloc[0].event_date.year - byear
+        if byear is not None:
+            age = data.iloc[0].event_date.year - byear
 
     # data = data.dropna(subset=["exam_item_code", "exam_result"])
 
@@ -92,13 +96,14 @@ def main(out_file):
                                         remote_bind_address=(cred["remote_db_host"], cred["remote_db_port"]),
                                         local_bind_address=(cred["local_db_host"], cred["local_db_port"]))
     with tunnel_forward:
+        print("Tunnel created")
         con_str_event = "mysql://%s:%s@%s:%s/%s?charset=utf8" % (cred["db_user"], cred["db_pass"], cred["db_host_ev"],
-                                                                 cred["db_port_ev"], cred["event_db"])
+                                                                 cred["local_db_port"], cred["event_db"])
         conn_event = create_engine(con_str_event, encoding='utf-8')
 
         df = pd.DataFrame(columns=get_attribute_columns())
 
-        patients = pd.read_csv("target_patients.csv", dtype={"patient_id": object})
+        patients = pd.read_csv("target_patients_18.csv", dtype={"patient_id": object})
 
         i = 1
         n = len(patients)
@@ -116,5 +121,5 @@ def main(out_file):
 
 
 if __name__ == '__main__':
-    out_file = "stroke_data_2.csv" if len(sys.argv) == 1 else sys.argv[1]
+    out_file = "stroke_data_18.csv" if len(sys.argv) == 1 else sys.argv[1]
     main(out_file)

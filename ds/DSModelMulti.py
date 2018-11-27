@@ -145,7 +145,6 @@ class DSModelMulti(nn.Module):
                 builder += "\n\tR%d: %s \n%s" % (r[1], r[2], r[4])
                 # TODO : Show all values of masses
 
-
     def generate_statistic_single_rules(self, X, breaks=2, column_names=None):
         """
         Populates the model with attribute-independant rules based on statistical breaks.
@@ -321,3 +320,11 @@ class DSModelMulti(nn.Module):
 
     def get_rules_size(self):
         return self.n
+
+    def get_rules_by_instance(self, x, order_by=0):
+        sel = self._select_rules(x)
+        rules = np.zeros((len(sel), self.k + 1))
+        for i in range(len(sel)):
+            rules[i, :] = self.masses[sel[i]].data.numpy()
+        rules = rules[np.lexsort((rules[:, order_by],))]
+        return rules

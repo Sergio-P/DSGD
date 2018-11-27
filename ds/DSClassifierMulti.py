@@ -221,8 +221,29 @@ class DSClassifierMulti(ClassifierMixin):
 
     def predict_proba(self, X):
         """
-        Predict the score of belogning to the first class
-        :param X: Feature vectors
-        :return: Score for class 0 for each feature vector
+        Predict the score of belogning to all classes
+        :param X: Feature vector
+        :return: Class scores for each feature vector
         """
-        return self.predict(X, one_hot=True)[:,1]
+        return self.predict(X, one_hot=True)
+
+    def predict_explain(self, x):
+        """
+        Predict the score of belogning to each class and give an explanation of that decision
+        :param x: A single Feature vectors
+        :return:
+        """
+        pred = self.predict_proba([x])[0]
+        cls = np.argmax(pred)
+        rls = self.model.get_rules_by_instance(x, order_by=cls)
+
+        # String interpretation
+        builder = "DS Model predicts class %d\n" % cls
+        for i in range(len(pred)-1):
+            builder += " Class %d: \t%.3f\n" % (i, pred[i])
+        builder += " Uncertainty:\t%.3f\n\n" % pred[-1]
+        for i in range(min(len(rls), 5)):
+            builder += " "
+        return builder
+
+
