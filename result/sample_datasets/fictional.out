@@ -1,0 +1,695 @@
+== f_blob.csv =====
+
+Optimization started
+Processing epoch 290
+Training time: 70.97s, epochs: 289
+
+Least training loss reached: 0.008
+DSModelMulti(
+  DS Classifier using 10 rules
+
+  Rule 1: attr0 < 2.727
+        C1: 0.000       C2: 0.612       Unc: 0.388
+
+  Rule 2: 2.727 < attr0 < 3.922
+        C1: 0.045       C2: 0.567       Unc: 0.388
+
+  Rule 3: 3.922 < attr0 < 5.117
+        C1: 0.120       C2: 0.328       Unc: 0.552
+
+  Rule 4: attr0 > 5.117
+        C1: 0.143       C2: 0.024       Unc: 0.833
+
+  Rule 5: attr1 < -6.708
+        C1: 0.484       C2: 0.000       Unc: 0.516
+
+  Rule 6: -6.708 < attr1 < -1.710
+        C1: 0.149       C2: 0.494       Unc: 0.357
+
+  Rule 7: -1.710 < attr1 < 3.288
+        C1: 0.000       C2: 0.629       Unc: 0.371
+
+  Rule 8: attr1 > 3.288
+        C1: 0.000       C2: 0.435       Unc: 0.565
+
+  Rule 9: Positive attr0 - 3.922, attr1 - -1.710
+        C1: 0.000       C2: 0.217       Unc: 0.783
+
+  Rule 10: Negative attr0 - 3.922, attr1 - -1.710
+        C1: 0.000       C2: 0.000       Unc: 1.000
+)
+
+Accuracy:       1.000%
+AUC ROC:        1.000%
+F1 Macro:       1.000
+F1 Micro:       1.000
+
+Confusion Matrix:
+[[90  0]
+ [ 0 60]]
+
+
+== f_blob2.csv ====
+
+Optimization started
+Processing epoch 290
+Training time: 70.97s, epochs: 289
+
+Least training loss reached: 0.008
+DSModelMulti(
+  DS Classifier using 10 rules
+
+  Rule 1: attr0 < 2.727
+        C1: 0.000       C2: 0.612       Unc: 0.388
+
+  Rule 2: 2.727 < attr0 < 3.922
+        C1: 0.045       C2: 0.567       Unc: 0.388
+
+  Rule 3: 3.922 < attr0 < 5.117
+        C1: 0.120       C2: 0.328       Unc: 0.552
+
+  Rule 4: attr0 > 5.117
+        C1: 0.143       C2: 0.024       Unc: 0.833
+
+  Rule 5: attr1 < -6.708
+        C1: 0.484       C2: 0.000       Unc: 0.516
+
+  Rule 6: -6.708 < attr1 < -1.710
+        C1: 0.149       C2: 0.494       Unc: 0.357
+
+  Rule 7: -1.710 < attr1 < 3.288
+        C1: 0.000       C2: 0.629       Unc: 0.371
+
+  Rule 8: attr1 > 3.288
+        C1: 0.000       C2: 0.435       Unc: 0.565
+
+  Rule 9: Positive attr0 - 3.922, attr1 - -1.710
+        C1: 0.000       C2: 0.217       Unc: 0.783
+
+  Rule 10: Negative attr0 - 3.922, attr1 - -1.710
+        C1: 0.000       C2: 0.000       Unc: 1.000
+)
+
+Accuracy:       0.993%
+AUC ROC:        0.994%
+F1 Macro:       0.993
+F1 Micro:       0.993
+
+Confusion Matrix:
+[[72  0]
+ [ 1 77]]
+
+
+== f_blob_rand.csv ====
+
+Optimization started
+Processing epoch 246
+Training time: 172.72s, epochs: 245
+
+Least training loss reached: 0.001
+DSModelMulti(
+  DS Classifier using 28 rules
+
+  Rule 1: attr0 < -6.577
+        C1: 0.037       C2: 0.397       Unc: 0.566
+
+  Rule 2: -6.577 < attr0 < -1.102
+        C1: 0.239       C2: 0.261       Unc: 0.500
+
+  Rule 3: -1.102 < attr0 < 4.373
+        C1: 0.265       C2: 0.235       Unc: 0.500
+
+  Rule 4: attr0 > 4.373
+        C1: 1.000       C2: 0.000       Unc: 0.000
+
+  Rule 5: attr1 < -6.179
+        C1: 0.023       C2: 0.374       Unc: 0.603
+
+  Rule 6: -6.179 < attr1 < -4.587
+        C1: 0.095       C2: 0.405       Unc: 0.500
+
+  Rule 7: -4.587 < attr1 < -2.994
+        C1: 0.153       C2: 0.347       Unc: 0.500
+
+  Rule 8: attr1 > -2.994
+        C1: 0.000       C2: 0.754       Unc: 0.246
+
+  Rule 9: attr2 < 0.303
+        C1: 0.241       C2: 0.107       Unc: 0.652
+
+  Rule 10: 0.303 < attr2 < 0.498
+        C1: 0.133       C2: 0.316       Unc: 0.551
+
+  Rule 11: 0.498 < attr2 < 0.692
+        C1: 0.279       C2: 0.143       Unc: 0.578
+
+  Rule 12: attr2 > 0.692
+        C1: 0.282       C2: 0.122       Unc: 0.595
+
+  Rule 13: attr3 < 0.307
+        C1: 0.001       C2: 0.412       Unc: 0.587
+
+  Rule 14: 0.307 < attr3 < 0.512
+        C1: 0.234       C2: 0.207       Unc: 0.559
+
+  Rule 15: 0.512 < attr3 < 0.716
+        C1: 0.142       C2: 0.230       Unc: 0.628
+
+  Rule 16: attr3 > 0.716
+        C1: 0.035       C2: 0.407       Unc: 0.558
+
+  Rule 17: Positive attr0 - -1.102, attr1 - -4.587
+        C1: 0.321       C2: 0.130       Unc: 0.549
+
+  Rule 18: Negative attr0 - -1.102, attr1 - -4.587
+        C1: 0.182       C2: 0.178       Unc: 0.640
+
+  Rule 19: Positive attr0 - -1.102, attr2 - 0.498
+        C1: 0.000       C2: 0.573       Unc: 0.427
+
+  Rule 20: Negative attr0 - -1.102, attr2 - 0.498
+        C1: 0.000       C2: 0.458       Unc: 0.542
+
+  Rule 21: Positive attr0 - -1.102, attr3 - 0.512
+        C1: 0.231       C2: 0.174       Unc: 0.594
+
+  Rule 22: Negative attr0 - -1.102, attr3 - 0.512
+        C1: 0.161       C2: 0.252       Unc: 0.586
+
+  Rule 23: Positive attr1 - -4.587, attr2 - 0.498
+        C1: 0.035       C2: 0.405       Unc: 0.560
+
+  Rule 24: Negative attr1 - -4.587, attr2 - 0.498
+        C1: 0.137       C2: 0.215       Unc: 0.648
+
+  Rule 25: Positive attr1 - -4.587, attr3 - 0.512
+        C1: 0.138       C2: 0.277       Unc: 0.585
+
+  Rule 26: Negative attr1 - -4.587, attr3 - 0.512
+        C1: 0.111       C2: 0.369       Unc: 0.520
+
+  Rule 27: Positive attr2 - 0.498, attr3 - 0.512
+        C1: 0.016       C2: 0.303       Unc: 0.682
+
+  Rule 28: Negative attr2 - 0.498, attr3 - 0.512
+        C1: 0.063       C2: 0.295       Unc: 0.642
+)
+
+Accuracy:       1.000%
+AUC ROC:        1.000%
+F1 Macro:       1.000
+F1 Micro:       1.000
+
+Confusion Matrix:
+[[76  0]
+ [ 0 74]]
+
+
+== f_blob_rep.csv ====
+
+Optimization started
+Processing epoch 255
+Training time: 168.85s, epochs: 254
+
+Least training loss reached: 0.002
+DSModelMulti(
+  DS Classifier using 28 rules
+
+  Rule 1: attr0 < -6.298
+        C1: 0.109       C2: 0.177       Unc: 0.714
+
+  Rule 2: -6.298 < attr0 < -0.879
+        C1: 0.615       C2: 0.076       Unc: 0.308
+
+  Rule 3: -0.879 < attr0 < 4.539
+        C1: 0.390       C2: 0.115       Unc: 0.495
+
+  Rule 4: attr0 > 4.539
+        C1: 0.235       C2: 0.265       Unc: 0.500
+
+  Rule 5: attr1 < -6.264
+        C1: 0.047       C2: 0.308       Unc: 0.645
+
+  Rule 6: -6.264 < attr1 < -4.654
+        C1: 0.278       C2: 0.222       Unc: 0.500
+
+  Rule 7: -4.654 < attr1 < -3.044
+        C1: 0.228       C2: 0.272       Unc: 0.500
+
+  Rule 8: attr1 > -3.044
+        C1: 0.311       C2: 0.189       Unc: 0.500
+
+  Rule 9: attr2 < -9.872
+        C1: 0.000       C2: 0.450       Unc: 0.550
+
+  Rule 10: -9.872 < attr2 < -5.534
+        C1: 0.158       C2: 0.342       Unc: 0.500
+
+  Rule 11: -5.534 < attr2 < -1.196
+        C1: 0.427       C2: 0.073       Unc: 0.500
+
+  Rule 12: attr2 > -1.196
+        C1: 0.251       C2: 0.249       Unc: 0.500
+
+  Rule 13: attr3 < -2.122
+        C1: 0.000       C2: 0.606       Unc: 0.394
+
+  Rule 14: -2.122 < attr3 < 8.920
+        C1: 0.516       C2: 0.005       Unc: 0.478
+
+  Rule 15: 8.920 < attr3 < 19.963
+        C1: 1.000       C2: 0.000       Unc: 0.000
+
+  Rule 16: attr3 > 19.963
+        C1: 1.000       C2: 0.000       Unc: 0.000
+
+  Rule 17: Positive attr0 - -0.879, attr1 - -4.654
+        C1: 0.314       C2: 0.154       Unc: 0.532
+
+  Rule 18: Negative attr0 - -0.879, attr1 - -4.654
+        C1: 0.176       C2: 0.147       Unc: 0.676
+
+  Rule 19: Positive attr0 - -0.879, attr2 - -5.534
+        C1: 0.038       C2: 0.326       Unc: 0.635
+
+  Rule 20: Negative attr0 - -0.879, attr2 - -5.534
+        C1: 0.024       C2: 0.322       Unc: 0.655
+
+  Rule 21: Positive attr0 - -0.879, attr3 - 8.920
+        C1: 0.000       C2: 0.396       Unc: 0.604
+
+  Rule 22: Negative attr0 - -0.879, attr3 - 8.920
+        C1: 0.303       C2: 0.197       Unc: 0.500
+
+  Rule 23: Positive attr1 - -4.654, attr2 - -5.534
+        C1: 0.099       C2: 0.369       Unc: 0.532
+
+  Rule 24: Negative attr1 - -4.654, attr2 - -5.534
+        C1: 0.000       C2: 0.400       Unc: 0.600
+
+  Rule 25: Positive attr1 - -4.654, attr3 - 8.920
+        C1: 0.336       C2: 0.137       Unc: 0.528
+
+  Rule 26: Negative attr1 - -4.654, attr3 - 8.920
+        C1: 0.298       C2: 0.061       Unc: 0.641
+
+  Rule 27: Positive attr2 - -5.534, attr3 - 8.920
+        C1: 0.328       C2: 0.049       Unc: 0.623
+
+  Rule 28: Negative attr2 - -5.534, attr3 - 8.920
+        C1: 0.276       C2: 0.079       Unc: 0.645
+)
+
+Accuracy:       1.000%
+AUC ROC:        1.000%
+F1 Macro:       1.000
+F1 Micro:       1.000
+
+Confusion Matrix:
+[[71  0]
+ [ 0 79]]
+
+
+== f_blob_rand_rep.csv ===
+
+Optimization started
+Processing epoch 148
+Training time: 256.33s, epochs: 147
+
+Least training loss reached: 0.008
+DSModelMulti(
+  DS Classifier using 54 rules
+
+  Rule 1: attr0 < -4.676
+        C1: 0.192       C2: 0.258       Unc: 0.549
+
+  Rule 2: -4.676 < attr0 < -2.299
+        C1: 0.022       C2: 0.564       Unc: 0.414
+
+  Rule 3: -2.299 < attr0 < 0.079
+        C1: 0.128       C2: 0.476       Unc: 0.396
+
+  Rule 4: attr0 > 0.079
+        C1: 0.177       C2: 0.260       Unc: 0.563
+
+  Rule 5: attr1 < -7.673
+        C1: 0.132       C2: 0.371       Unc: 0.496
+
+  Rule 6: -7.673 < attr1 < -4.372
+        C1: 0.242       C2: 0.214       Unc: 0.544
+
+  Rule 7: -4.372 < attr1 < -1.072
+        C1: 0.545       C2: 0.061       Unc: 0.394
+
+  Rule 8: attr1 > -1.072
+        C1: 0.484       C2: 0.161       Unc: 0.355
+
+  Rule 9: attr2 < 0.319
+        C1: 0.340       C2: 0.171       Unc: 0.489
+
+  Rule 10: 0.319 < attr2 < 0.508
+        C1: 0.224       C2: 0.262       Unc: 0.515
+
+  Rule 11: 0.508 < attr2 < 0.697
+        C1: 0.357       C2: 0.154       Unc: 0.489
+
+  Rule 12: attr2 > 0.697
+        C1: 0.163       C2: 0.337       Unc: 0.500
+
+  Rule 13: attr3 < 0.314
+        C1: 0.074       C2: 0.413       Unc: 0.513
+
+  Rule 14: 0.314 < attr3 < 0.509
+        C1: 0.037       C2: 0.451       Unc: 0.512
+
+  Rule 15: 0.509 < attr3 < 0.704
+        C1: 0.189       C2: 0.297       Unc: 0.513
+
+  Rule 16: attr3 > 0.704
+        C1: 0.136       C2: 0.364       Unc: 0.500
+
+  Rule 17: attr4 < -4.112
+        C1: 0.466       C2: 0.161       Unc: 0.373
+
+  Rule 18: -4.112 < attr4 < 1.729
+        C1: 0.195       C2: 0.250       Unc: 0.555
+
+  Rule 19: 1.729 < attr4 < 7.570
+        C1: 0.596       C2: 0.000       Unc: 0.404
+
+  Rule 20: attr4 > 7.570
+        C1: 0.000       C2: 0.684       Unc: 0.316
+
+  Rule 21: attr5 < -5.690
+        C1: 0.000       C2: 0.647       Unc: 0.353
+
+  Rule 22: -5.690 < attr5 < -2.130
+        C1: 0.473       C2: 0.112       Unc: 0.415
+
+  Rule 23: -2.130 < attr5 < 1.430
+        C1: 0.687       C2: 0.000       Unc: 0.313
+
+  Rule 24: attr5 > 1.430
+        C1: 0.619       C2: 0.000       Unc: 0.381
+
+  Rule 25: Positive attr0 - -2.299, attr1 - -4.372
+        C1: 0.113       C2: 0.370       Unc: 0.517
+
+  Rule 26: Negative attr0 - -2.299, attr1 - -4.372
+        C1: 0.341       C2: 0.169       Unc: 0.489
+
+  Rule 27: Positive attr0 - -2.299, attr2 - 0.508
+        C1: 0.243       C2: 0.235       Unc: 0.522
+
+  Rule 28: Negative attr0 - -2.299, attr2 - 0.508
+        C1: 0.450       C2: 0.040       Unc: 0.510
+
+  Rule 29: Positive attr0 - -2.299, attr3 - 0.509
+        C1: 0.221       C2: 0.254       Unc: 0.524
+
+  Rule 30: Negative attr0 - -2.299, attr3 - 0.509
+        C1: 0.193       C2: 0.317       Unc: 0.491
+
+  Rule 31: Positive attr0 - -2.299, attr4 - 1.729
+        C1: 0.234       C2: 0.250       Unc: 0.516
+
+  Rule 32: Negative attr0 - -2.299, attr4 - 1.729
+        C1: 0.048       C2: 0.435       Unc: 0.517
+
+  Rule 33: Positive attr0 - -2.299, attr5 - -2.130
+        C1: 0.313       C2: 0.201       Unc: 0.486
+
+  Rule 34: Negative attr0 - -2.299, attr5 - -2.130
+        C1: 0.124       C2: 0.364       Unc: 0.513
+
+  Rule 35: Positive attr1 - -4.372, attr2 - 0.508
+        C1: 0.362       C2: 0.127       Unc: 0.510
+
+  Rule 36: Negative attr1 - -4.372, attr2 - 0.508
+        C1: 0.440       C2: 0.091       Unc: 0.469
+
+  Rule 37: Positive attr1 - -4.372, attr3 - 0.509
+        C1: 0.248       C2: 0.239       Unc: 0.513
+
+  Rule 38: Negative attr1 - -4.372, attr3 - 0.509
+        C1: 0.425       C2: 0.109       Unc: 0.466
+
+  Rule 39: Positive attr1 - -4.372, attr4 - 1.729
+        C1: 0.170       C2: 0.330       Unc: 0.500
+
+  Rule 40: Negative attr1 - -4.372, attr4 - 1.729
+        C1: 0.238       C2: 0.245       Unc: 0.517
+
+  Rule 41: Positive attr1 - -4.372, attr5 - -2.130
+        C1: 0.307       C2: 0.203       Unc: 0.491
+
+  Rule 42: Negative attr1 - -4.372, attr5 - -2.130
+        C1: 0.171       C2: 0.329       Unc: 0.500
+
+  Rule 43: Positive attr2 - 0.508, attr3 - 0.509
+        C1: 0.256       C2: 0.221       Unc: 0.523
+
+  Rule 44: Negative attr2 - 0.508, attr3 - 0.509
+        C1: 0.205       C2: 0.266       Unc: 0.528
+
+  Rule 45: Positive attr2 - 0.508, attr4 - 1.729
+        C1: 0.223       C2: 0.253       Unc: 0.524
+
+  Rule 46: Negative attr2 - 0.508, attr4 - 1.729
+        C1: 0.383       C2: 0.107       Unc: 0.510
+
+  Rule 47: Positive attr2 - 0.508, attr5 - -2.130
+        C1: 0.042       C2: 0.468       Unc: 0.490
+
+  Rule 48: Negative attr2 - 0.508, attr5 - -2.130
+        C1: 0.343       C2: 0.195       Unc: 0.462
+
+  Rule 49: Positive attr3 - 0.509, attr4 - 1.729
+        C1: 0.121       C2: 0.351       Unc: 0.528
+
+  Rule 50: Negative attr3 - 0.509, attr4 - 1.729
+        C1: 0.327       C2: 0.160       Unc: 0.514
+
+  Rule 51: Positive attr3 - 0.509, attr5 - -2.130
+        C1: 0.355       C2: 0.132       Unc: 0.514
+
+  Rule 52: Negative attr3 - 0.509, attr5 - -2.130
+        C1: 0.376       C2: 0.161       Unc: 0.463
+
+  Rule 53: Positive attr4 - 1.729, attr5 - -2.130
+        C1: 0.107       C2: 0.393       Unc: 0.500
+
+  Rule 54: Negative attr4 - 1.729, attr5 - -2.130
+        C1: 0.417       C2: 0.094       Unc: 0.488
+)
+
+Accuracy:       1.000%
+AUC ROC:        1.000%
+F1 Macro:       1.000
+F1 Micro:       1.000
+
+Confusion Matrix:
+[[75  0]
+ [ 0 75]]
+
+
+== f_blob_mult.csv ===
+Optimization started
+Processing epoch 272
+Training time: 61.19s, epochs: 271
+
+Least training loss reached: 0.005
+DSModelMulti(
+  DS Classifier using 10 rules
+
+  Rule 1: attr0 < -2.114
+        C1: 0.064       C2: 0.669       Unc: 0.267
+
+  Rule 2: -2.114 < attr0 < 1.803
+        C1: 0.078       C2: 0.462       Unc: 0.460
+
+  Rule 3: 1.803 < attr0 < 5.720
+        C1: 0.278       C2: 0.149       Unc: 0.573
+
+  Rule 4: attr0 > 5.720
+        C1: 0.937       C2: 0.000       Unc: 0.063
+
+  Rule 5: attr1 < -5.427
+        C1: 0.108       C2: 0.246       Unc: 0.646
+
+  Rule 6: -5.427 < attr1 < -0.590
+        C1: 0.236       C2: 0.000       Unc: 0.764
+
+  Rule 7: -0.590 < attr1 < 4.246
+        C1: 0.050       C2: 0.000       Unc: 0.950
+
+  Rule 8: attr1 > 4.246
+        C1: 0.873       C2: 0.000       Unc: 0.127
+
+  Rule 9: Positive attr0 - 1.803, attr1 - -0.590
+        C1: 0.045       C2: 0.432       Unc: 0.523
+
+  Rule 10: Negative attr0 - 1.803, attr1 - -0.590
+        C1: 0.000       C2: 0.385       Unc: 0.615
+)
+
+Accuracy:       0.980%
+AUC ROC:        0.981%
+F1 Macro:       0.980
+F1 Micro:       0.980
+
+Confusion Matrix:
+[[77  3]
+ [ 0 70]]
+
+
+== f_blob_mult_2.csv ===
+
+Optimization started
+Processing epoch 191
+Training time: 42.14s, epochs: 190
+
+Least training loss reached: 0.124
+DSModelMulti(
+  DS Classifier using 10 rules
+
+  Rule 1: attr0 < -1.946
+        C1: 0.670       C2: 0.000       Unc: 0.330
+
+  Rule 2: -1.946 < attr0 < 1.838
+        C1: 0.754       C2: 0.000       Unc: 0.246
+
+  Rule 3: 1.838 < attr0 < 5.623
+        C1: 0.224       C2: 0.171       Unc: 0.605
+
+  Rule 4: attr0 > 5.623
+        C1: 0.163       C2: 0.090       Unc: 0.747
+
+  Rule 5: attr1 < -4.973
+        C1: 0.000       C2: 0.685       Unc: 0.315
+
+  Rule 6: -4.973 < attr1 < -0.287
+        C1: 0.354       C2: 0.075       Unc: 0.572
+
+  Rule 7: -0.287 < attr1 < 4.399
+        C1: 0.016       C2: 0.553       Unc: 0.432
+
+  Rule 8: attr1 > 4.399
+        C1: 0.649       C2: 0.000       Unc: 0.351
+
+  Rule 9: Positive attr0 - 1.838, attr1 - -0.287
+        C1: 0.000       C2: 0.039       Unc: 0.961
+
+  Rule 10: Negative attr0 - 1.838, attr1 - -0.287
+        C1: 0.225       C2: 0.146       Unc: 0.629
+)
+
+Accuracy:       0.847%
+AUC ROC:        0.828%
+F1 Macro:       0.837
+F1 Micro:       0.847
+
+Confusion Matrix:
+[[45 19]
+ [ 4 82]]
+
+
+== f_blob_mult_3.csv ===
+
+Optimization started
+Processing epoch 177
+Training time: 49.12s, epochs: 176
+
+Least training loss reached: 0.062
+DSModelMulti(
+  DS Classifier using 10 rules
+
+  Rule 1: attr0 < 2.428
+        C1: 0.000       C2: 0.259       C3: 0.000       Unc: 0.741
+
+  Rule 2: 2.428 < attr0 < 4.462
+        C1: 0.427       C2: 0.000       C3: 0.297       Unc: 0.275
+
+  Rule 3: 4.462 < attr0 < 6.495
+        C1: 0.501       C2: 0.000       C3: 0.207       Unc: 0.291
+
+  Rule 4: attr0 > 6.495
+        C1: 0.588       C2: 0.000       C3: 0.000       Unc: 0.412
+
+  Rule 5: attr1 < 0.615
+        C1: 0.277       C2: 0.052       C3: 0.000       Unc: 0.672
+
+  Rule 6: 0.615 < attr1 < 4.205
+        C1: 0.000       C2: 0.102       C3: 0.541       Unc: 0.357
+
+  Rule 7: 4.205 < attr1 < 7.795
+        C1: 0.000       C2: 0.194       C3: 0.529       Unc: 0.277
+
+  Rule 8: attr1 > 7.795
+        C1: 0.000       C2: 0.252       C3: 0.056       Unc: 0.692
+
+  Rule 9: Positive attr0 - 4.462, attr1 - 4.205
+        C1: 0.000       C2: 0.027       C3: 0.645       Unc: 0.328
+
+  Rule 10: Negative attr0 - 4.462, attr1 - 4.205
+        C1: 0.066       C2: 0.224       C3: 0.000       Unc: 0.710
+)
+
+Accuracy:       0.907%
+F1 Macro:       0.909
+F1 Micro:       0.907
+
+Confusion Matrix:
+[[43  0  1]
+ [ 0 47  7]
+ [ 3  3 46]]
+
+
+== f_xor.csv ===
+
+Optimization started
+Processing epoch 203
+Training time: 38.66s, epochs: 202
+
+Least training loss reached: 0.026
+DSModelMulti(
+  DS Classifier using 10 rules
+
+  Rule 1: attr0 < -0.338
+        C1: 0.000       C2: 0.000       Unc: 1.000
+
+  Rule 2: -0.338 < attr0 < 0.055
+        C1: 0.172       C2: 0.042       Unc: 0.786
+
+  Rule 3: 0.055 < attr0 < 0.449
+        C1: 0.168       C2: 0.128       Unc: 0.704
+
+  Rule 4: attr0 > 0.449
+        C1: 0.165       C2: 0.124       Unc: 0.711
+
+  Rule 5: attr1 < -0.415
+        C1: 0.095       C2: 0.000       Unc: 0.905
+
+  Rule 6: -0.415 < attr1 < -0.034
+        C1: 0.062       C2: 0.208       Unc: 0.731
+
+  Rule 7: -0.034 < attr1 < 0.346
+        C1: 0.200       C2: 0.044       Unc: 0.756
+
+  Rule 8: attr1 > 0.346
+        C1: 0.239       C2: 0.067       Unc: 0.694
+
+  Rule 9: Positive attr0 - 0.055, attr1 - -0.034
+        C1: 0.633       C2: 0.011       Unc: 0.357
+
+  Rule 10: Negative attr0 - 0.055, attr1 - -0.034
+        C1: 0.000       C2: 0.771       Unc: 0.229
+)
+
+Accuracy:       0.958%
+F1 Macro:       0.955
+F1 Micro:       0.958
+
+Confusion Matrix:
+[[73  3]
+ [ 2 42]]

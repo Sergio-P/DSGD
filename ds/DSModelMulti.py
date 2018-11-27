@@ -103,39 +103,48 @@ class DSModelMulti(nn.Module):
             builder += "Unc: %.3f\n" % ms[self.k]
         return builder[:-1]
 
-    # def find_most_important_rules(self, classes=None, threshold=0.2, class_names=None):
-    #     """
-    #     Shows the most contributive rules for the classes specified
-    #     :param classes: Array of classes, by default shows all clases
-    #     :param threshold: score minimum value considered to be contributive
-    #     :return: A string containing the information about most important rules
-    #     """
-    #     builder = "Most important rules\n"
-    #     if classes is None:
-    #         classes = range(self.k)
-    #
-    #     if class_names is None:
-    #         class_names = [str(i) for i in range(self.k)]
-    #
-    #     for cls in classes:
-    #         builder += "\n For class %s\n" % class_names[cls]
-    #         found = []
-    #         for i in range(len(self.masses)):
-    #             ms = self.masses[i]
-    #             score = (ms[cls]) * (1 - ms[-1])
-    #             if score >= threshold * threshold:
-    #                 ps = str(self.preds[i])
-    #                 found.append((score, "  Rule %d: %s (%.3f)\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % \
-    #                             (i + 1, ps, np.sqrt(score.detach().numpy()), ms[0], ms[1], ms[2])))
-    #
-    #         found.sort(reverse=True)
-    #         if len(found) == 0:
-    #             builder += "   No rules found\n"
-    #
-    #         for rule in found:
-    #             builder += rule[1]
-    #
-    #     return builder[:-1]
+    def find_most_important_rules(self, classes=None, threshold=0.2):
+        """
+        Shows the most contributive rules for the classes specified
+        :param classes: Array of classes, by default shows all clases
+        :param threshold: score minimum value considered to be contributive
+        :return: A list containing the information about most important rules
+        """
+        if classes is None:
+            classes = [i for i in range(self.k)]
+
+        rules = {}
+        for cls in classes:
+            found = []
+            for i in range(len(self.masses)):
+                ms = self.masses[i]
+                score = (ms[cls]) * (1 - ms[-1])
+                if score >= threshold * threshold:
+                    ps = str(self.preds[i])
+                    found.append((score, i + 1, ps, np.sqrt(score.detach().numpy()), ms))
+
+            found.sort(reverse=True)
+            rules[cls] = found
+
+        return rules
+
+    def print_most_important_rules(self, classes=None, threshold=0.2, class_names=None):
+        rules = self.find_most_important_rules(classes, threshold)
+
+        if class_names is None:
+            class_names = ["C%d" % i for i in range(self.k)]
+
+        if classes is None:
+            classes = [i for i in range(self.k)]
+
+        builder = ""
+        for i in range(len(classes)):
+            rs = rules[classes[i]]
+            builder += "\n\nMost important rules for class %s" % class_names[i]
+            for r in rs:
+                builder += "\n\tR%d: %s \n%s" % (r[1], r[2], r[4])
+                # TODO : Show all values of masses
+
 
     def generate_statistic_single_rules(self, X, breaks=2, column_names=None):
         """
