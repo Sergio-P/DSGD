@@ -96,7 +96,7 @@ class DSClassifierMulti(ClassifierMixin):
 
         dataset = torch.utils.data.TensorDataset(Xt, yt)
         train_loader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
-                                                   num_workers=self.num_workers, pin_memory=True)
+                                                   num_workers=self.num_workers, pin_memory=False)
         epoch = 0
         for epoch in range(self.max_iter):
             acc_loss = 0
@@ -153,7 +153,7 @@ class DSClassifierMulti(ClassifierMixin):
         epoch = 0
         for epoch in range(self.max_iter):
             if print_every_epochs is not None and epoch % print_every_epochs == 0:
-                print("\rProcessing epoch %d" % (epoch + 1), end="")
+                print("\rProcessing epoch\t%d\t%.4f\t" % (epoch + 1, losses[-1] if len(losses) > 1 else 1), end="")
             acc_loss = 0
             for Xi, yi in train_loader:
                 tq = time.time()
@@ -182,7 +182,7 @@ class DSClassifierMulti(ClassifierMixin):
 
         dt = time.time() - ti
         if print_time:
-            print("\nTraining time: %.2fs, epochs: %d" % (dt, epoch))
+            print("\nTraining time: %.2fs, epochs: %d" % (dt, epoch + 1))
 
         if print_partial_time:
             print("├- Forward eval time:  %.3fs" % dt_forward)

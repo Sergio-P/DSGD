@@ -45,8 +45,13 @@ DSC = DSClassifierMulti(10, max_iter=200, debug_mode=True, lossfn="MSE")
 losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1)
 y_pred = DSC.predict(X_test)
 print("Total Rules: %d" % DSC.model.get_rules_size())
+print("\nTraining Time: %.2f" % dt)
+print("Epochs: %d" % (epoch + 1))
+print("Min Loss: %.3f" % losses[-1])
 print("\nAccuracy: %.1f%%" % (accuracy_score(y_test, y_pred) * 100.))
 print("F1 Macro: %.3f" % (f1_score(y_test, y_pred, average="macro")))
+
+
 print("Confusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
 # print(DSC.model.find_most_important_rules(class_names=["0", "1", "2", "3"]))

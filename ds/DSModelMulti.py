@@ -121,7 +121,7 @@ class DSModelMulti(nn.Module):
                 score = (ms[cls]) * (1 - ms[-1])
                 if score >= threshold * threshold:
                     ps = str(self.preds[i])
-                    found.append((score, i + 1, ps, np.sqrt(score.detach().numpy()), ms))
+                    found.append((score, i, ps, np.sqrt(score.detach().numpy()), ms))
 
             found.sort(reverse=True)
             rules[cls] = found
@@ -168,14 +168,14 @@ class DSModelMulti(nn.Module):
             else:
                 # First rule
                 v = mean[i] + std[i] * brks[0]
-                self.add_rule(DSRule(lambda x, i=i: x[i] <= v, "%s < %.3f" % (column_names[i], v)))
+                self.add_rule(DSRule(lambda x, i=i, v=v: x[i] <= v, "%s < %.3f" % (column_names[i], v)))
                 # Mid rules
                 for j in range(1, len(brks)):
                     vl = v
                     v = mean[i] + std[i] * brks[j]
-                    self.add_rule(DSRule(lambda x, i=i: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, column_names[i], v)))
+                    self.add_rule(DSRule(lambda x, i=i, vl=vl, v=v: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, column_names[i], v)))
                 # Last rule
-                self.add_rule(DSRule(lambda x, i=i: x[i] > v, "%s > %.3f" % (column_names[i], v)))
+                self.add_rule(DSRule(lambda x, i=i, v=v: x[i] > v, "%s > %.3f" % (column_names[i], v)))
 
     def generate_categorical_rules(self, X, column_names=None, exclude=None):
         """
@@ -215,9 +215,11 @@ class DSModelMulti(nn.Module):
         for i in range(len(mean)):
             for j in range(i + offset, len(mean)):
                 # mk = mean[i] * mean[j]
-                self.add_rule(DSRule(lambda x, i=i, j=j: (x[i] - mean[i]) * (x[j] - mean[j]) > 0,
+                mi = mean[i]
+                mj = mean[j]
+                self.add_rule(DSRule(lambda x, i=i, j=j, mi=mi, mj=mj: (x[i] - mi) * (x[j] - mj) > 0,
                                      "Positive %s - %.3f, %s - %.3f" % (column_names[i],mean[i],column_names[j],mean[j])))
-                self.add_rule(DSRule(lambda x, i=i, j=j: (x[i] - mean[i]) * (x[j] - mean[j]) <= 0,
+                self.add_rule(DSRule(lambda x, i=i, j=j, mi=mi, mj=mj: (x[i] - mi) * (x[j] - mj) <= 0,
                                      "Negative %s - %.3f, %s - %.3f" % (column_names[i],mean[i],column_names[j],mean[j])))
 
     def generate_custom_range_single_rules(self, column_names, name, breaks):
@@ -233,14 +235,14 @@ class DSModelMulti(nn.Module):
             raise NameError("Cannot find column with name %s" % name)
         v = breaks[0]
         # First rule
-        self.add_rule(DSRule(lambda x, i=i: x[i] <= v, "%s < %.3f" % (name, v)))
+        self.add_rule(DSRule(lambda x, i=i, v=v: x[i] <= v, "%s < %.3f" % (name, v)))
         # Mid rules
         for j in range(1, len(breaks)):
             vl = v
             v = breaks[j]
-            self.add_rule(DSRule(lambda x, i=i: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, name, v)))
+            self.add_rule(DSRule(lambda x, i=i, vl=vl, v=v: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, name, v)))
         # Last rule
-        self.add_rule(DSRule(lambda x, i=i: x[i] > v, "%s > %.3f" % (name, v)))
+        self.add_rule(DSRule(lambda x, i=i, v=v: x[i] > v, "%s > %.3f" % (name, v)))
 
     def generate_custom_range_rules_by_gender(self, column_names, name, breaks_men, breaks_women, gender_name="gender"):
         """
@@ -260,15 +262,15 @@ class DSModelMulti(nn.Module):
         for gv, gname, breaks in [(0, "Men", breaks_men), (1, "Women", breaks_women)]:
             v = breaks[0]
             # First rule
-            self.add_rule(DSRule(lambda x, i=i: x[g] == gv and x[i] <= v, "%s: %s < %.3f" % (gname, name, v)))
+            self.add_rule(DSRule(lambda x, i=i, v=v, g=g, gv=gv: x[g] == gv and x[i] <= v, "%s: %s < %.3f" % (gname, name, v)))
             # Mid rules
             for j in range(1, len(breaks)):
                 vl = v
                 v = breaks[j]
-                self.add_rule(DSRule(lambda x, i=i: x[g] == gv and vl <= x[i] < v, "%s: %.3f < %s < %.3f" %
+                self.add_rule(DSRule(lambda x, i=i, g=g, gv=gv, vl=vl, v=v: x[g] == gv and vl <= x[i] < v, "%s: %.3f < %s < %.3f" %
                                      (gname, vl, name, v)))
             # Last rule
-            self.add_rule(DSRule(lambda x, i=i: x[g] == gv and x[i] > v, "%s: %s > %.3f" % (gname, name, v)))
+            self.add_rule(DSRule(lambda x, i=i, g=g, gv=gv, v=v: x[g] == gv and x[i] > v, "%s: %s > %.3f" % (gname, name, v)))
 
     def generate_outside_range_pair_rules(self, column_names, ranges):
         """
@@ -289,13 +291,13 @@ class DSModelMulti(nn.Module):
                 hj = ranges[index_j][1]
                 # Add Rules
                 if not np.isnan(li) and not np.isnan(lj):
-                    self.add_rule(DSRule(lambda x, i=i, j=j: x[i] < li and x[j] < lj, "Low %s and Low %s" % (col_i, col_j)))
+                    self.add_rule(DSRule(lambda x, i=i, j=j, li=li, lj=lj: x[i] < li and x[j] < lj, "Low %s and Low %s" % (col_i, col_j)))
                 if not np.isnan(hi) and not np.isnan(lj):
-                    self.add_rule(DSRule(lambda x, i=i, j=j: x[i] > hi and x[j] < lj, "High %s and Low %s" % (col_i, col_j)))
+                    self.add_rule(DSRule(lambda x, i=i, j=j, hi=hi, lj=lj: x[i] > hi and x[j] < lj, "High %s and Low %s" % (col_i, col_j)))
                 if not np.isnan(hi) and not np.isnan(hj):
-                    self.add_rule(DSRule(lambda x, i=i, j=j: x[i] > hi and x[j] > hj, "High %s and High %s" % (col_i, col_j)))
+                    self.add_rule(DSRule(lambda x, i=i, j=j, hi=hi, hj=hj: x[i] > hi and x[j] > hj, "High %s and High %s" % (col_i, col_j)))
                 if not np.isnan(li) and not np.isnan(hj):
-                    self.add_rule(DSRule(lambda x, i=i, j=j: x[i] < li and x[j] > hj, "Low %s and High %s" % (col_i, col_j)))
+                    self.add_rule(DSRule(lambda x, i=i, j=j, li=li, hj=hj: x[i] < li and x[j] > hj, "Low %s and High %s" % (col_i, col_j)))
 
     def load_rules_bin(self, filename):
         """

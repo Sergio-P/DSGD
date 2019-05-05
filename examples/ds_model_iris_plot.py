@@ -18,10 +18,10 @@ y = data.iloc[:, -1].values
 # X_test = data.iloc[cut:, :-1].values
 # y_test = data.iloc[cut:, -1].values
 
-DSC = DSClassifierMulti(3, max_iter=200, debug_mode=True, min_dloss=0.0005, lr=0.002, lossfn="MSE", skip_dr_norm=False)
+DSC = DSClassifierMulti(3, max_iter=200, debug_mode=True, min_dloss=0.0001, lr=0.002, lossfn="MSE", skip_dr_norm=False)
 # DSC.model.load_rules_bin("rules.bin")
 losses, epoch, dt = DSC.fit(X, y, add_single_rules=True, single_rules_breaks=3, add_mult_rules=True,
-                            column_names=data.columns[:-1], print_every_epochs=10, print_final_model=False)
+                            column_names=data.columns[:-1], print_every_epochs=3, print_final_model=False)
 
 x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
 y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5

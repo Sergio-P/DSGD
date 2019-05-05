@@ -1,9 +1,10 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 
-from ds.DSClassifierGD import DSClassifier
+from ds.DSClassifierMulti import DSClassifierMulti
 
 data = pd.read_csv("data/digits.csv", header=None)
 data = data.rename(columns={64: "cls"})
@@ -42,11 +43,29 @@ y_test = data.iloc[cut:, -1].values
 # exit()
 
 
-DSC = DSClassifier(max_iter=200, debug_mode=True)
+DSC = DSClassifierMulti(2, max_iter=50, debug_mode=True)
 losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1)
 y_pred = DSC.predict(X_test)
 print("Total Rules: %d" % DSC.model.get_rules_size())
 print("\nAccuracy: %.1f%%" % (accuracy_score(y_test, y_pred) * 100.))
 print("Confusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
-print(DSC.model.find_most_important_rules(class_names=["0", "1"]))
+rls = DSC.model.find_most_important_rules(threshold=0.1)
+dpx = {}
+for cls in rls:
+    rs = rls[cls]
+    px = np.zeros(64)
+    for r in rs:
+        n = int(r[2].replace("X[", "").replace(" ", "").replace("]", "").split("=")[0])
+        t = int(r[2].replace("X[", "").replace(" ", "").replace("]", "").split("=")[1])
+        s = r[3][0]
+        s = s if t == 1 else -s
+        px[n] = s
+    dpx[cls] = px
+
+for cls in rls:
+    px = dpx[1 - cls] - 0.5 * dpx[cls]
+    plt.imshow(px.reshape((8, 8)), cmap="RdBu")
+    plt.colorbar()
+    plt.title("Pixel contribution for class %d" % cls)
+    plt.show()

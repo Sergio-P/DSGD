@@ -28,36 +28,46 @@ losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rule
                             column_names=data.columns[:-1], print_every_epochs=1, print_final_model=True)
 y_pred = DSC.predict(X_test)
 # print(DSC.model.find_most_important_rules(class_names=["setosa", "virginica", "versicolor"]))
-print("\nAccuracy:\t%.3f%%" % (accuracy_score(y_test, y_pred)))
-print("AUC ROC:\t%.3f%%" % (roc_auc_score(y_test, y_pred)))
-print("F1 Macro:\t%.3f" % (f1_score(y_test, y_pred, average="macro")))
-print("F1 Micro:\t%.3f" % (f1_score(y_test, y_pred, average="micro")))
+ac = accuracy_score(y_test, y_pred)
+print("\nAccuracy:\t%.3f" % ac)
+if n_class == 2:
+    auc = roc_auc_score(y_test, y_pred)
+    print("AUC ROC:\t%.3f" % auc)
+else:
+    auc = 0
+f1mac = f1_score(y_test, y_pred, average="macro")
+print("F1 Macro:\t%.3f" % f1mac)
+f1mic = f1_score(y_test, y_pred, average="micro")
+print("F1 Micro:\t%.3f" % f1mic)
 print("\nConfusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
 
+print("%d,%.3f,%.3f,%.3f,%.3f,%.3f" % (epoch + 1, dt, ac, auc, f1mac, losses[-1]))
 
-x_min, x_max = X_test[:, 0].min() - .5, X_test[:, 0].max() + .5
-y_min, y_max = X_test[:, 1].min() - .5, X_test[:, 1].max() + .5
-h = .1  # step size in the mesh
-xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-N = len(yy.ravel())
-mesh = np.c_[xx.ravel(), yy.ravel()]
-Z = DSC.predict_proba(mesh)
-print(Z)
+if "--no-plot" not in sys.argv:
+    x_min, x_max = X_test[:, 0].min() - .5, X_test[:, 0].max() + .5
+    y_min, y_max = X_test[:, 1].min() - .5, X_test[:, 1].max() + .5
+    h = .25  # step size in the mesh
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+    N = len(yy.ravel())
+    mesh = np.c_[xx.ravel(), yy.ravel()]
+    Z = DSC.predict_proba(mesh)
+    Z = Z[:, 1]
+    print(Z)
 
-# Put the result into a color plot
-Z = Z.reshape(xx.shape)
-plt.figure(1, figsize=(4, 3))
-plt.pcolormesh(xx, yy, Z, cmap=plt.cm.coolwarm)
+    # Put the result into a color plot
+    Z = Z.reshape(xx.shape)
+    plt.figure(1, figsize=(4, 3))
+    plt.pcolormesh(xx, yy, Z, cmap=plt.cm.coolwarm)
 
-# Plot also the training points
-plt.scatter(X_test[:, 0], X_test[:, 1], c=y_test, edgecolors='k', cmap=plt.cm.coolwarm)
-plt.xlabel('Attribute 1')
-plt.ylabel('Attribute 2')
+    # Plot also the training points
+    plt.scatter(X_test[:, 0], X_test[:, 1], c=y_test, edgecolors='k', cmap=plt.cm.coolwarm)
+    plt.xlabel('x')
+    plt.ylabel('y')
 
-plt.xlim(xx.min(), xx.max())
-plt.ylim(yy.min(), yy.max())
-plt.xticks(())
-plt.yticks(())
+    plt.xlim(xx.min(), xx.max())
+    plt.ylim(yy.min(), yy.max())
+    plt.xticks(())
+    plt.yticks(())
 
-plt.show()
+    plt.show()
