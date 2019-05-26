@@ -45,29 +45,29 @@ print(confusion_matrix(y_test, y_pred))
 print("%d,%.3f,%.3f,%.3f,%.3f,%.3f" % (epoch + 1, dt, ac, auc, f1mac, losses[-1]))
 
 if "--no-plot" not in sys.argv:
-    x_min, x_max = X_test[:, 0].min() - .5, X_test[:, 0].max() + .5
-    y_min, y_max = X_test[:, 1].min() - .5, X_test[:, 1].max() + .5
-    h = .25  # step size in the mesh
+    x_min, x_max = X_test[:, 0].min() * 1.2, X_test[:, 0].max() * 1.2
+    y_min, y_max = X_test[:, 1].min() * 1.2, X_test[:, 1].max() * 1.2
+    h = .05  # step size in the mesh
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
     N = len(yy.ravel())
     mesh = np.c_[xx.ravel(), yy.ravel()]
     Z = DSC.predict_proba(mesh)
     Z = Z[:, 1]
-    print(Z)
+    # print(Z)
 
     # Put the result into a color plot
     Z = Z.reshape(xx.shape)
-    plt.figure(1, figsize=(4, 3))
+    plt.figure(1, figsize=(8, 8))
     plt.pcolormesh(xx, yy, Z, cmap=plt.cm.coolwarm)
 
     # Plot also the training points
     plt.scatter(X_test[:, 0], X_test[:, 1], c=y_test, edgecolors='k', cmap=plt.cm.coolwarm)
-    plt.xlabel('x')
-    plt.ylabel('y')
+    plt.xlabel('X')
+    plt.ylabel('Y')
 
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
-    plt.xticks(())
-    plt.yticks(())
+    # plt.xticks(())
+    # plt.yticks(())
 
     plt.show()

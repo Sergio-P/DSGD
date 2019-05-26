@@ -53,7 +53,7 @@ class DSModelMulti(nn.Module):
         :param X: Set of inputs
         :return: Set of prediction for each input in one hot encoding format
         """
-        out = []
+        out = torch.zeros(len(X), self.k)
         for i in range(len(X)):
             sel = self._select_rules(X[i])
             if len(sel) == 0:
@@ -66,8 +66,8 @@ class DSModelMulti(nn.Module):
                     res = self.sm(mf[:-1])
                 else:
                     res = (mf[:-1] / torch.sum(mf[:-1])).view(self.k)
-                out.append(res)
-        return torch.cat(out).view(len(X), self.k)
+                out[i] = res
+        return out
 
     def normalize(self):
         """

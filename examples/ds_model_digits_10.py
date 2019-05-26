@@ -41,8 +41,9 @@ plt.show()
 # exit()
 
 
-DSC = DSClassifierMulti(10, max_iter=200, debug_mode=True, lossfn="MSE")
-losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1)
+DSC = DSClassifierMulti(10, min_iter=25, max_iter=25, debug_mode=True, lossfn="MSE")
+losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1,
+                            print_partial_time=True, print_time=True)
 y_pred = DSC.predict(X_test)
 print("Total Rules: %d" % DSC.model.get_rules_size())
 print("\nTraining Time: %.2f" % dt)
