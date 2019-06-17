@@ -41,7 +41,7 @@ plt.show()
 # exit()
 
 
-DSC = DSClassifierMulti(10, min_iter=25, max_iter=25, debug_mode=True, lossfn="MSE")
+DSC = DSClassifierMulti(10, min_iter=25, max_iter=25, debug_mode=True, lossfn="MSE", precompute_rules=True)
 losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1,
                             print_partial_time=True, print_time=True)
 y_pred = DSC.predict(X_test)

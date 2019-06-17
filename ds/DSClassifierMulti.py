@@ -17,7 +17,7 @@ class DSClassifierMulti(ClassifierMixin):
     """
 
     def __init__(self, num_classes, lr=0.005, max_iter=200, min_iter=2, min_dloss=0.001, optim="adam", lossfn="CE", debug_mode=False,
-                 use_softmax=False, skip_dr_norm=True, batch_size=4000, num_workers=1, balance_class_data=False):
+                 use_softmax=False, skip_dr_norm=True, batch_size=4000, num_workers=1, precompute_rules=False):
         """
         Creates the classifier and the DSModel (accesible in attribute model)
         :param lr: Learning rate
@@ -36,9 +36,9 @@ class DSClassifierMulti(ClassifierMixin):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.min_dJ = min_dloss
-        self.balance_class_data = balance_class_data
+        self.balance_class_data = False
         self.debug_mode = debug_mode
-        self.model = DSModelMulti(num_classes, use_softmax=use_softmax, skip_dr_norm=skip_dr_norm)
+        self.model = DSModelMulti(num_classes, use_softmax=use_softmax, skip_dr_norm=skip_dr_norm, precompute_rules=precompute_rules)
 
     def fit(self, X, y, add_single_rules=False, single_rules_breaks=2, add_mult_rules=False, column_names=None, **kwargs):
         """
@@ -50,14 +50,14 @@ class DSClassifierMulti(ClassifierMixin):
         :param add_mult_rules: Generates multiplication pair rules
         :param kwargs: In case of debugging, parameters of optimize_debug
         """
-        if self.balance_class_data:
-            nmin = np.max(np.bincount(y))
-            Xm = pd.DataFrame(np.concatenate((X,y.reshape(-1,1)), axis=1))
-            Xm = pd.concat([Xm[Xm.iloc[:,-1] == 0].sample(n=nmin, replace=True),
-                            Xm[Xm.iloc[:,-1] == 1].sample(n=nmin, replace=True)], axis=0)\
-                    .sample(frac=1).reset_index(drop=True).values
-            X = Xm[:,:-1]
-            y = Xm[:,-1].astype(int)
+        # if self.balance_class_data:
+        #     nmin = np.max(np.bincount(y))
+        #     Xm = pd.DataFrame(np.concatenate((X,y.reshape(-1,1)), axis=1))
+        #     Xm = pd.concat([Xm[Xm.iloc[:,-1] == 0].sample(n=nmin, replace=True),
+        #                     Xm[Xm.iloc[:,-1] == 1].sample(n=nmin, replace=True)], axis=0)\
+        #             .sample(frac=1).reset_index(drop=True).values
+        #     X = Xm[:,:-1]
+        #     y = Xm[:,-1].astype(int)
 
         if add_single_rules:
             self.model.generate_statistic_single_rules(X, breaks=single_rules_breaks, column_names=column_names)
@@ -78,6 +78,10 @@ class DSClassifierMulti(ClassifierMixin):
         else:
             raise RuntimeError("Unknown loss function %s" % self.lossfn)
 
+        # Add index to X
+        X = np.insert(X, 0, values=np.arange(0, len(X)), axis=1)
+        # print(X)
+
         if self.debug_mode:
             return self._optimize_debug(X, y, optimizer, criterion, **kwargs)
         else:
@@ -86,6 +90,7 @@ class DSClassifierMulti(ClassifierMixin):
     def _optimize(self, X, y, optimizer, criterion):
         losses = []
         self.model.train()
+        self.model.clear_rmap()
 
         Xt = Variable(torch.Tensor(X))
         if self.lossfn == "CE":
@@ -139,6 +144,7 @@ class DSClassifierMulti(ClassifierMixin):
         ti = time.time()
 
         self.model.train()
+        self.model.clear_rmap()
         Xt = Variable(torch.Tensor(X))
         if self.lossfn == "CE":
             yt = Variable(torch.Tensor(y).long())
@@ -209,6 +215,8 @@ class DSClassifierMulti(ClassifierMixin):
         :return: Classes for each feature vector
         """
         self.model.eval()
+        self.model.clear_rmap()
+        X = np.insert(X, 0, values=np.arange(0, len(X)), axis=1)
 
         with torch.no_grad():
             Xt = torch.Tensor(X)

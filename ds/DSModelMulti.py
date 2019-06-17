@@ -17,7 +17,7 @@ class DSModelMulti(nn.Module):
     Torch module implementation of DS General Classification
     """
 
-    def __init__(self, k, use_softmax=True, skip_dr_norm=False):
+    def __init__(self, k, use_softmax=True, skip_dr_norm=False, precompute_rules=False):
         """
         Creates an empty DS Model
         """
@@ -28,6 +28,8 @@ class DSModelMulti(nn.Module):
         self.k = k
         self.use_softmax = use_softmax
         self.skip_dr_norm = skip_dr_norm
+        self.precompute_rules = precompute_rules
+        self.rmap = {}
         if use_softmax:
             self.sm = Softmax(dim=0)
 
@@ -55,7 +57,7 @@ class DSModelMulti(nn.Module):
         """
         out = torch.zeros(len(X), self.k)
         for i in range(len(X)):
-            sel = self._select_rules(X[i])
+            sel = self._select_rules(X[i, 1:], int(X[i, 0].item()))
             if len(sel) == 0:
                 raise RuntimeError("No rule especified for input No %d" % i)
             else:
@@ -69,6 +71,9 @@ class DSModelMulti(nn.Module):
                 out[i] = res
         return out
 
+    def clear_rmap(self):
+        self.rmap = {}
+
     def normalize(self):
         """
         Normalize all masses in order to keep constraints of DS
@@ -80,12 +85,16 @@ class DSModelMulti(nn.Module):
             else:
                 mass.data.div_(torch.sum(mass.data))
 
-    def _select_rules(self, x):
+    def _select_rules(self, x, index=None):
+        if self.precompute_rules and index in self.rmap:
+            return self.rmap[index]
         x = x.data.numpy()
         sel = []
         for i in range(self.n):
             if self.preds[i](x):
                 sel.append(i)
+        if self.precompute_rules and index is not None:
+            self.rmap[index] = sel
         return sel
 
     def extra_repr(self):
@@ -113,26 +122,25 @@ class DSModelMulti(nn.Module):
         if classes is None:
             classes = [i for i in range(self.k)]
 
-        rules = {}
-        for cls in classes:
-            found = []
-            for i in range(len(self.masses)):
-                ms = self.masses[i]
-                score = (ms[cls]) * (1 - ms[-1])
-                if score >= threshold * threshold:
-                    ps = str(self.preds[i])
-                    found.append((score, i, ps, np.sqrt(score.detach().numpy()), ms))
+        with torch.no_grad():
+            rules = {}
+            for j in range(len(classes)):
+                cls = classes[j]
+                found = []
+                for i in range(len(self.masses)):
+                    ms = self.masses[i].view(-1).detach().numpy()
+                    score = (ms[j]) * (1 - ms[-1])
+                    if score >= threshold * threshold:
+                        ps = str(self.preds[i])
+                        found.append((score, i, ps, np.sqrt(score), ms))
 
-            found.sort(reverse=True)
-            rules[cls] = found
+                found.sort(reverse=True)
+                rules[cls] = found
 
         return rules
 
-    def print_most_important_rules(self, classes=None, threshold=0.2, class_names=None):
+    def print_most_important_rules(self, classes=None, threshold=0.2):
         rules = self.find_most_important_rules(classes, threshold)
-
-        if class_names is None:
-            class_names = ["C%d" % i for i in range(self.k)]
 
         if classes is None:
             classes = [i for i in range(self.k)]
@@ -140,10 +148,13 @@ class DSModelMulti(nn.Module):
         builder = ""
         for i in range(len(classes)):
             rs = rules[classes[i]]
-            builder += "\n\nMost important rules for class %s" % class_names[i]
+            builder += "\n\nMost important rules for class %s" % classes[i]
             for r in rs:
-                builder += "\n\tR%d: %s \n%s" % (r[1], r[2], r[4])
-                # TODO : Show all values of masses
+                builder += "\n\n\t[%.3f] R%d: %s\n\t\t" % (r[3], r[1], r[2])
+                masses = r[4]
+                for j in range(len(masses)):
+                    builder += "\t%s: %.3f" % (classes[j][:3] if j < len(classes) else "Unc", masses[j])
+        print(builder)
 
     def generate_statistic_single_rules(self, X, breaks=2, column_names=None):
         """

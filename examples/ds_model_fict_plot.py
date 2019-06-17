@@ -7,6 +7,7 @@ from sklearn.metrics import confusion_matrix
 
 from ds.DSClassifierMulti import DSClassifierMulti
 
+dataset = sys.argv[1] if len(sys.argv) > 1 else input("Dataset: ")
 data = pd.read_csv(sys.argv[1])
 data = data.sample(frac=1).reset_index(drop=True)
 

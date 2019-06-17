@@ -43,7 +43,7 @@ y_test = data.iloc[cut:, -1].values
 # exit()
 
 
-DSC = DSClassifierMulti(2, max_iter=50, debug_mode=True)
+DSC = DSClassifierMulti(2, max_iter=100, debug_mode=True, lr=0.0025)
 losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1)
 y_pred = DSC.predict(X_test)
 print("Total Rules: %d" % DSC.model.get_rules_size())
@@ -65,7 +65,7 @@ for cls in rls:
 
 for cls in rls:
     px = dpx[1 - cls] - 0.5 * dpx[cls]
-    plt.imshow(px.reshape((8, 8)), cmap="RdBu")
+    plt.imshow(px.reshape((8, 8)), cmap="viridis_r")
     plt.colorbar()
     plt.title("Pixel contribution for class %d" % cls)
     plt.show()
