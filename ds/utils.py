@@ -45,3 +45,15 @@ def one_hot(n, k):
     for i in range(len(n)):
         a[i, int(n[i])] = 1
     return a
+
+
+def h_center(z):
+    return np.exp(- z * z)
+
+
+def h_right(z):
+    return (1 + np.tanh(z - 1))/2
+
+
+def h_left(z):
+    return (1 - np.tanh(z + 1))/2

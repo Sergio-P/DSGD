@@ -247,6 +247,7 @@ def dempster_rule_kt(m1, m2, normalize=False):
 
 
 if __name__ == '__main__':
-    m1 = (0, 0.32, 0.08, 0.60)
-    m2 = (0, 0.36, 0.18, 0.46)
-    print(dempster_rule_chain(m2, m1))
+    import numpy as np
+    m1 = np.array((0, 0.2, 0.1, 0.3, 0.5))
+    m2 = np.array((0, 0.3, 0.1, 0.4, 0.2))
+    print(dempster_rule_kt(m2, m1, True))

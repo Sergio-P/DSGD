@@ -122,7 +122,7 @@ class DSClassifierMulti(ClassifierMixin):
 
     def _optimize_debug(self, X, y, optimizer, criterion, print_init_model=False, print_final_model=False, print_time=True,
                         print_partial_time=False, print_every_epochs=None, print_least_loss=True, return_partial_dt=False,
-                        disable_all_print=False):
+                        disable_all_print=False, print_epoch_progress=False):
         losses = []
         print("Optimization started")
 
@@ -153,15 +153,23 @@ class DSClassifierMulti(ClassifierMixin):
             yt = Variable(torch.Tensor(one_hot(yt, self.k)).float())
 
         dataset = torch.utils.data.TensorDataset(Xt, yt)
-        train_loader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
-                                                   num_workers=self.num_workers, pin_memory=True)
+        N = len(dataset)
+        train_loader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=False,
+                                                   num_workers=self.num_workers, pin_memory=False)
 
         epoch = 0
         for epoch in range(self.max_iter):
             if print_every_epochs is not None and epoch % print_every_epochs == 0:
                 print("\rProcessing epoch\t%d\t%.4f\t" % (epoch + 1, losses[-1] if len(losses) > 0 else 1), end="")
             acc_loss = 0
+            if print_epoch_progress:
+                acc_n = 0
+                print("")
             for Xi, yi in train_loader:
+                ni = len(yi)
+                if print_epoch_progress:
+                    acc_n += ni
+                    print(("\r %d%% [" % (100*acc_n/N)) + "#"*int(25*acc_n/N) + " "*int(25 - 25*acc_n/N) + "]", end="", flush=True)
                 tq = time.time()
                 y_pred = self.model.forward(Xi)
                 dt_forward += time.time() - tq
@@ -180,7 +188,7 @@ class DSClassifierMulti(ClassifierMixin):
                 self.model.normalize()
                 dt_norm += time.time() - tq
 
-                acc_loss += loss.data.item()
+                acc_loss += loss.data.item() * ni / N
 
             losses.append(acc_loss)
             if epoch > self.min_iter and abs(losses[-2] - acc_loss) < self.min_dJ:
@@ -252,6 +260,6 @@ class DSClassifierMulti(ClassifierMixin):
         builder += " Uncertainty:\t%.3f\n\n" % pred[-1]
         for i in range(min(len(rls), 5)):
             builder += " "
-        return builder
+        return pred, cls, rls, builder
 
 
