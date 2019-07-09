@@ -83,6 +83,8 @@ class DSModelMulti(nn.Module):
             if self.use_softmax:
                 mass = self.sm(mass)
             else:
+                if torch.sum(mass.data) == 0:
+                    raise RuntimeError("Zero mass sum")
                 mass.data.div_(torch.sum(mass.data))
 
     def _select_rules(self, x, index=None):
