@@ -193,6 +193,9 @@ class DSClassifierMulti(ClassifierMixin):
             losses.append(acc_loss)
             if epoch > self.min_iter and abs(losses[-2] - acc_loss) < self.min_dJ:
                 break
+            if np.isnan(acc_loss):
+                print(self.model)
+                raise RuntimeError("Loss is NaN")
 
         dt = time.time() - ti
         if print_time:
