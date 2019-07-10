@@ -176,6 +176,11 @@ class DSClassifierMulti(ClassifierMixin):
 
                 tq = time.time()
                 loss = criterion(y_pred, yi)
+                if np.isnan(loss.data.item()):
+                    print(self.model)
+                    print(y_pred)
+                    print(yi)
+                    raise RuntimeError("Loss is NaN")
                 optimizer.zero_grad()
                 loss.backward()
                 dt_loss += time.time() - tq
@@ -193,9 +198,6 @@ class DSClassifierMulti(ClassifierMixin):
             losses.append(acc_loss)
             if epoch > self.min_iter and abs(losses[-2] - acc_loss) < self.min_dJ:
                 break
-            if np.isnan(acc_loss):
-                print(self.model)
-                raise RuntimeError("Loss is NaN")
 
         dt = time.time() - ti
         if print_time:
