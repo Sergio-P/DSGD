@@ -8,7 +8,6 @@ from torch.autograd import Variable
 from torch.utils.data.sampler import WeightedRandomSampler
 
 from ds.DSModelMulti import DSModelMulti
-from ds.utils import one_hot
 
 
 class DSClassifierMulti(ClassifierMixin):
@@ -16,7 +15,7 @@ class DSClassifierMulti(ClassifierMixin):
     Implementation of Classifier based on DSModel
     """
 
-    def __init__(self, num_classes, lr=0.005, max_iter=200, min_iter=2, min_dloss=0.001, optim="adam", lossfn="CE", debug_mode=False,
+    def __init__(self, num_classes, lr=0.005, max_iter=200, min_iter=2, min_dloss=0.001, optim="adam", lossfn="MSE", debug_mode=False,
                  use_softmax=False, skip_dr_norm=True, batch_size=4000, num_workers=1, precompute_rules=False):
         """
         Creates the classifier and the DSModel (accesible in attribute model)
@@ -94,10 +93,9 @@ class DSClassifierMulti(ClassifierMixin):
 
         Xt = Variable(torch.Tensor(X))
         if self.lossfn == "CE":
-            yt = Variable(torch.Tensor(y).long())
+            yt = Variable(torch.LongTensor(y))
         else:
-            yt = torch.Tensor(y).view(len(y), 1)
-            yt = Variable(one_hot(yt, self.k).float())
+            yt = torch.nn.functional.one_hot(torch.LongTensor(y), self.k).float()
 
         dataset = torch.utils.data.TensorDataset(Xt, yt)
         train_loader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
@@ -147,10 +145,9 @@ class DSClassifierMulti(ClassifierMixin):
         self.model.clear_rmap()
         Xt = Variable(torch.Tensor(X))
         if self.lossfn == "CE":
-            yt = Variable(torch.Tensor(y).long())
+            yt = Variable(torch.LongTensor(y))
         else:
-            yt = torch.Tensor(y).view(len(y), 1)
-            yt = Variable(torch.Tensor(one_hot(yt, self.k)).float())
+            yt = torch.nn.functional.one_hot(torch.LongTensor(y), self.k).float()
 
         dataset = torch.utils.data.TensorDataset(Xt, yt)
         N = len(dataset)

@@ -27,7 +27,7 @@ X_test = data.iloc[cut:, :-1].values
 y_test = data.iloc[cut:, -1].values
 
 
-DSC = DSClassifierMulti(2, min_iter=1, max_iter=2, debug_mode=True, num_workers=4,
+DSC = DSClassifierMulti(2, min_iter=15, max_iter=50, debug_mode=True, num_workers=4,
                         precompute_rules=True, batch_size=200)
 
 # Add custom rules
