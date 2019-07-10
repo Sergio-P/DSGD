@@ -66,7 +66,7 @@ class DSModelMulti(nn.Module):
                     mf = dempster_rule_kt(mf, self.masses[sel[j]], not self.skip_dr_norm)
                 if self.use_softmax:
                     res = self.sm(mf[:-1])
-                elif torch.sum(mf[:-1]) == 0:
+                elif torch.sum(mf[:-1]) > 0:
                     res = (mf[:-1] / torch.sum(mf[:-1])).view(self.k)
                 else:
                     print("Warning: Total conflict mass found")
