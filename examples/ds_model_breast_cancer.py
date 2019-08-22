@@ -3,6 +3,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
 from sklearn.metrics import roc_auc_score
 
 from ds.DSClassifierMulti import DSClassifierMulti
+from ds.DSClassifierMultiQ import DSClassifierMultiQ
 
 data = pd.read_csv("data/breast-cancer-wisconsin.csv")
 
@@ -20,8 +21,8 @@ X_test = data.iloc[cut:, :-1].values
 y_test = data.iloc[cut:, -1].values
 
 
-DSC = DSClassifierMulti(2, min_iter=41, max_iter=41, debug_mode=True, lossfn="MSE", min_dloss=0.0008, lr=0.01,
-                        precompute_rules=True)
+DSC = DSClassifierMultiQ(2, max_iter=100, debug_mode=True, lossfn="MSE", min_dloss=0.0001, lr=0.01,
+                         precompute_rules=True)
 losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=3,
                             column_names=data.columns[:-1], print_every_epochs=1)
 y_pred = DSC.predict(X_test)
@@ -37,4 +38,4 @@ print("Confusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
 print("AUC score: %.3f" % (roc_auc_score(y_test, y_score[:, 1])))
 
-DSC.model.print_most_important_rules(threshold=0.5, classes=["Benign", "Malignant"])
+DSC.model.print_most_important_rules(threshold=0.2, classes=["Benign", "Malignant"])

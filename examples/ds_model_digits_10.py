@@ -4,6 +4,7 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.metrics import confusion_matrix
 
 from ds.DSClassifierMulti import DSClassifierMulti
+from ds.DSClassifierMultiQ import DSClassifierMultiQ
 
 data = pd.read_csv("data/digits.csv", header=None)
 data = data.rename(columns={64: "cls"})
@@ -22,26 +23,27 @@ X_test = (X_test >= 5).astype(int) + (X_test >= 10).astype(int)
 # X_test = (X_test >= 8).astype(int)
 y_test = data.iloc[cut:, -1].values
 
-plt.figure(figsize=(14,6))
-
-for i in range(10):
-    d0 = X_train[y_train == i][:2].reshape((2,8,8))
-    ax = plt.subplot(3, 7, 2*i + 1)
-    plt.imshow(d0[0], cmap="Blues")
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-    ax = plt.subplot(3, 7, 2*i + 2)
-    plt.imshow(d0[1], cmap="Blues")
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-
-plt.subplots_adjust(wspace=0, hspace=0)
-plt.show()
+# plt.figure(figsize=(14,6))
+#
+# for i in range(10):
+#     d0 = X_train[y_train == i][:2].reshape((2,8,8))
+#     ax = plt.subplot(3, 7, 2*i + 1)
+#     plt.imshow(d0[0], cmap="Blues")
+#     ax.set_xticklabels([])
+#     ax.set_yticklabels([])
+#     ax = plt.subplot(3, 7, 2*i + 2)
+#     plt.imshow(d0[1], cmap="Blues")
+#     ax.set_xticklabels([])
+#     ax.set_yticklabels([])
+#
+# plt.subplots_adjust(wspace=0, hspace=0)
+# plt.show()
 
 # exit()
 
 
-DSC = DSClassifierMulti(10, min_iter=25, max_iter=25, debug_mode=True, lossfn="MSE", precompute_rules=True)
+# DSC = DSClassifierMulti(10, min_iter=25, max_iter=25, debug_mode=True, lossfn="MSE", precompute_rules=True)
+DSC = DSClassifierMultiQ(10, max_iter=100, lr=0.01, debug_mode=True, lossfn="MSE", precompute_rules=True)
 losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1,
                             print_partial_time=True, print_time=True)
 y_pred = DSC.predict(X_test)

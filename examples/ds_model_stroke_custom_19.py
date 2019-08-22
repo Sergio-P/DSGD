@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -27,7 +28,7 @@ X_test = data.iloc[cut:, :-1].values
 y_test = data.iloc[cut:, -1].values
 
 
-DSC = DSClassifierMulti(2, min_iter=15, max_iter=50, debug_mode=True, num_workers=4,
+DSC = DSClassifierMulti(2, min_iter=2, max_iter=50, debug_mode=True, num_workers=4,
                         precompute_rules=True, batch_size=200)
 
 # Add custom rules
@@ -107,12 +108,19 @@ print("AUC score: %.3f" % (roc_auc_score(y_test, y_score[:, 1])))
 DSC.model.print_most_important_rules(["No Stroke", "Stroke"], 0.2)
 
 # Plotting #
+import json
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 EXP_PREFIX = "stroke-19"
+
+
+with open("rules.json", "w") as f:
+    rules = DSC.model.find_most_important_rules(["No Stroke", "Stroke"], 0.2)
+    json.dump(rules, f)
+
 
 # Loss curve
 plt.figure()
