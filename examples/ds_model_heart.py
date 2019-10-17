@@ -20,7 +20,7 @@ X_test = data.iloc[cut:, :-1].values
 y_test = data.iloc[cut:, -1].values
 
 
-DSC = DSClassifierMulti(2, max_iter=400, debug_mode=True, lr=0.0015, min_dloss=0.0005, balance_class_data=False,
+DSC = DSClassifierMulti(2, max_iter=400, debug_mode=True, lr=0.0015, min_dloss=0.0005,
                         lossfn="MSE")
 losses, epoch, dt = DSC.fit(X_train, y_train, column_names=data.columns[:-1], add_single_rules=True,
                             single_rules_breaks=3, print_every_epochs=1, print_final_model=True)

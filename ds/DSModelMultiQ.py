@@ -26,6 +26,7 @@ class DSModelMultiQ(nn.Module):
         self.k = k
         self.precompute_rules = precompute_rules
         self.rmap = {}
+        self.active_rules = []
 
     def add_rule(self, pred, m_sing=None, m_uncert=None):
         """
@@ -58,7 +59,9 @@ class DSModelMultiQ(nn.Module):
         for i in range(len(X)):
             sel = self._select_rules(X[i, 1:], int(X[i, 0].item()))
             if len(sel) == 0:
-                raise RuntimeError("No rule especified for input No %d" % i)
+                # raise RuntimeError("No rule especified for input No %d" % i)
+                print("Warning: No rule especified for input No %d" % i)
+                out[i] = torch.ones((self.k,)) / self.k
             else:
                 mt = torch.index_select(ms, 0, torch.LongTensor(sel))
                 qt = mt + mt[:, -1].view(-1, 1) * torch.ones(mt.shape)
@@ -113,6 +116,8 @@ class DSModelMultiQ(nn.Module):
         x = x.data.numpy()
         sel = []
         for i in range(self.n):
+            if len(self.active_rules) > 0 and i not in self.active_rules:
+                continue
             if self.preds[i](x):
                 sel.append(i)
         if self.precompute_rules and index is not None:
@@ -340,19 +345,20 @@ class DSModelMultiQ(nn.Module):
         Loads rules from a file, it deletes previous rules
         :param filename: The name of the input file
         """
-        with open(filename) as f:
+        with open(filename, "rb") as f:
             sv = dill.load(f)
             self.preds = sv["preds"]
             self._params = sv["masses"]
+            self.n = len(self.preds)
 
-        print(self.preds)
+        # print(self.preds)
 
     def save_rules_bin(self, filename):
         """
         Saves the current rules into a file
         :param filename: The name of the file
         """
-        with open(filename, "w") as f:
+        with open(filename, "wb") as f:
             sv = {"preds": self.preds, "masses": self._params}
             dill.dump(sv, f)
 
@@ -366,3 +372,11 @@ class DSModelMultiQ(nn.Module):
             rules[i, :] = self.masses[sel[i]].data.numpy()
         rules = rules[np.lexsort((rules[:, order_by],))]
         return rules
+
+    def keep_top_rules(self, n=5):
+        rd = self.find_most_important_rules()
+        rs = []
+        for k in rd:
+            rs.extend(rd[k][:n])
+        rids = [r[1] for r in rs]
+        self.active_rules = rids
