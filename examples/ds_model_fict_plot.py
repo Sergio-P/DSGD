@@ -24,7 +24,7 @@ y_test = data.iloc[cut:, -1].values
 
 n_class = len(np.unique(y_train))
 
-DSC = DSClassifierMultiQ(n_class, max_iter=500, debug_mode=True, min_dloss=0.0001, lr=0.005, lossfn="MSE",
+DSC = DSClassifierMultiQ(n_class, max_iter=500, debug_mode=True, min_dloss=0.0001, lr=0.025, lossfn="MSE",
                          precompute_rules=True)
 # DSC = DSClassifierMulti(n_class, max_iter=500, debug_mode=True, min_dloss=0.0001, lr=0.002, lossfn="MSE")
 

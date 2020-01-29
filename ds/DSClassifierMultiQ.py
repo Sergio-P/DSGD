@@ -39,6 +39,7 @@ class DSClassifierMultiQ(ClassifierMixin):
         self.debug_mode = debug_mode
         self.step_debug_mode = step_debug_mode
         self.model = DSModelMultiQ(num_classes, precompute_rules=precompute_rules)
+        self.classes_ = [k for k in range(self.k)]
 
     def fit(self, X, y, add_single_rules=False, single_rules_breaks=2, add_mult_rules=False, column_names=None, **kwargs):
         """
@@ -101,7 +102,8 @@ class DSClassifierMultiQ(ClassifierMixin):
             yt = torch.nn.functional.one_hot(torch.LongTensor(y), self.k).float()
 
         dataset = torch.utils.data.TensorDataset(Xt, yt)
-        train_loader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
+        N = len(dataset)
+        train_loader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=False,
                                                    num_workers=self.num_workers, pin_memory=False)
         epoch = 0
         for epoch in range(self.max_iter):
@@ -110,13 +112,13 @@ class DSClassifierMultiQ(ClassifierMixin):
                 optimizer.zero_grad()
                 y_pred = self.model.forward(Xi)
                 loss = criterion(y_pred, yi)
-                loss.backward()
+                loss.backward(retain_graph=True)
                 optimizer.step()
                 self.model.normalize()
-                acc_loss += loss.data.item()
+                acc_loss += loss.data.item() * len(yi) / N
 
             losses.append(acc_loss)
-            if epoch > self.min_iter and abs(losses[-2] - acc_loss) < self.min_dJ:
+            if epoch > self.min_iter and losses[-2] - acc_loss < self.min_dJ:
                 break
 
         return losses, epoch
@@ -347,6 +349,8 @@ class DSClassifierMultiQ(ClassifierMixin):
         """
         self.model.eval()
         self.model.clear_rmap()
+        if "values" in dir(X):
+            X = X.values
         X = np.insert(X, 0, values=np.arange(0, len(X)), axis=1)
 
         with torch.no_grad():

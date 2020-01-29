@@ -60,11 +60,11 @@ class DSModelMultiQ(nn.Module):
             sel = self._select_rules(X[i, 1:], int(X[i, 0].item()))
             if len(sel) == 0:
                 # raise RuntimeError("No rule especified for input No %d" % i)
-                print("Warning: No rule especified for input No %d" % i)
+                # print("Warning: No rule especified for input No %d" % i)
                 out[i] = torch.ones((self.k,)) / self.k
             else:
                 mt = torch.index_select(ms, 0, torch.LongTensor(sel))
-                qt = mt + mt[:, -1].view(-1, 1) * torch.ones(mt.shape)
+                qt = mt[:, :-1] + mt[:, -1].view(-1, 1) * torch.ones_like(mt[:, :-1])
                 res = qt.prod(0)
                 # if torch.isnan(res).any():
                 #     print(self._params)
@@ -72,11 +72,11 @@ class DSModelMultiQ(nn.Module):
                 #     print(qt)
                 #     print(res)
                 #     raise RuntimeError("NaN found in computation")
-                if res[:-1].sum().item() <= 1e-16:
-                    # print("Zero mass found")
-                    out[i] = res[:-1]
+                if res.sum().item() <= 1e-16:
+                    res = res + 1e-16
+                    out[i] = res / res.sum()
                 else:
-                    out[i] = res[:-1] / res[:-1].sum()
+                    out[i] = res / res.sum()
         return out
 
     def clear_rmap(self):
@@ -183,7 +183,7 @@ class DSModelMultiQ(nn.Module):
                 builder += "\n\n\t[%.3f] R%d: %s\n\t\t" % (r[3], r[1], r[2])
                 masses = r[4]
                 for j in range(len(masses)):
-                    builder += "\t%s: %.3f" % (classes[j][:3] if j < len(classes) else "Unc", masses[j])
+                    builder += "\t%s: %.3f" % (str(classes[j])[:3] if j < len(classes) else "Unc", masses[j])
         print(builder)
 
     def generate_statistic_single_rules(self, X, breaks=2, column_names=None):
@@ -365,6 +365,9 @@ class DSModelMultiQ(nn.Module):
     def get_rules_size(self):
         return self.n
 
+    def get_active_rules_size(self):
+        return len(self.active_rules)
+
     def get_rules_by_instance(self, x, order_by=0):
         sel = self._select_rules(x)
         rules = np.zeros((len(sel), self.k + 1))
@@ -373,10 +376,13 @@ class DSModelMultiQ(nn.Module):
         rules = rules[np.lexsort((rules[:, order_by],))]
         return rules
 
-    def keep_top_rules(self, n=5):
+    def keep_top_rules(self, n=5, imbalance=None):
         rd = self.find_most_important_rules()
         rs = []
         for k in rd:
-            rs.extend(rd[k][:n])
+            if imbalance is None:
+                rs.extend(rd[k][:n])
+            else:
+                rs.extend(rd[k][:round(n*imbalance[k])])
         rids = [r[1] for r in rs]
         self.active_rules = rids
