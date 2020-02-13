@@ -19,15 +19,12 @@ X_test = data.iloc[cut:, :-1].values
 y_test = data.iloc[cut:, -1].values
 
 DSC = DSClassifierMultiQ(3, min_iter=50, max_iter=400, debug_mode=True, lossfn="MSE")
-DSC.model.load_rules_bin("rules.bin")
-
-# params = {"add_single_rules": True, "single_rules_breaks": 3, "add_mult_rules": True, "column_names": data.columns[:-1],
-#           "print_every_epochs": 10, "print_final_model": True}
+# DSC.model.load_rules_bin("rules_iris.dsb")
 
 print(DSC.model)
 
-# losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=3, add_mult_rules=True,
-#                             column_names=data.columns[:-1], print_every_epochs=10, print_final_model=True)
+losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=3, add_mult_rules=True,
+                            column_names=data.columns[:-1], print_every_epochs=10, print_final_model=True)
 y_pred = DSC.predict(X_test)
 # print(DSC.model.find_most_important_rules(class_names=["setosa", "virginica", "versicolor"]))
 # print("\nTraining Time: %.2f" % dt)
@@ -39,4 +36,4 @@ print("F1 Micro: %.3f" % (f1_score(y_test, y_pred, average="micro")))
 print("\nConfusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
 #
-# DSC.model.save_rules_bin("rules.bin")
+# DSC.model.save_rules_bin("rules_iris.dsb")
