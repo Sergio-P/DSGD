@@ -170,7 +170,7 @@ model is created when invoking to `load_rules_bin` so we have already
 defined its configuration.
 
 
-### Complete example
+### Full example
 
-For a complete simple example please refer to the [Iris example](https://github.com/Sergio-P/DSGD/blob/master/examples/ds_model_iris_3.py). 
+For a full and simple example please refer to the [Iris example](https://github.com/Sergio-P/DSGD/blob/master/examples/ds_model_iris_3.py). 
 Uncomment and comment lines to see other features. 
