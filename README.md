@@ -1,6 +1,6 @@
 # DSGD
 
-Tabular classifier based on Dempster-Shafer Theory and 
+Tabular interpretable classifier based on Dempster-Shafer Theory and 
 Gradient Descent
 
 ## Description
@@ -16,6 +16,10 @@ which makes computations faster
 We always recommend using `DSClassifierMultiQ` since it is the 
 most stable and fastest implementation. Multi-class implementations
 can handle binary problems as well.
+
+## Installation
+
+TBD
 
 ## Usage
 
@@ -168,5 +172,5 @@ defined its configuration.
 
 ### Complete example
 
-For a complete simple example please refer to `examples/ds_model_iris_3.py`. 
+For a complete simple example please refer to the [Iris example](https://github.com/Sergio-P/DSGD/blob/master/examples/ds_model_iris_3.py). 
 Uncomment and comment lines to see other features. 
