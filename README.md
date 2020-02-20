@@ -25,20 +25,20 @@ can handle binary problems as well.
 
 ### Import the module
 
-    from dsgd import DSClassifierMultiQ
+    from dsgd import DSClassifierMultiQ
     
 ### Read the data
 
 The data can be read using `pandas`, `numpy` or other libraries
 
-    import pandas as pd
-    data = pd.read_csv("my_data.csv")
+    import pandas as pd
+    data = pd.read_csv("my_data.csv")
 
 After that, separate them into feature vectors and their corresponding 
 classes
 
-    y = data["class"].values
-    X = data.drop("class").values
+    y = data["class"].values
+    X = data.drop("class").values
     
 Ensure that feature vectors (X) and their classes (y) are a numpy 
 matrix and a numpy array, respectively. (In the example we use the
@@ -49,9 +49,9 @@ elements). And also ensure that classes are integers from `0` to
 
 ### Create the model
 
-    DSC = DSClassifierMultiQ(3, max_iter=150, debug_mode=True, 
-                        lossfn="MSE", min_dloss=0.0001, lr=0.005,
-                        precompute_rules=True)
+    DSC = DSClassifierMultiQ(3, max_iter=150, debug_mode=True, 
+                            lossfn="MSE", min_dloss=0.0001, lr=0.005,
+                            precompute_rules=True)
 
 In this step we create the model and set the configuration, the only
 required parameter is the first which indicates the number of classes
@@ -78,8 +78,8 @@ to define rules: manually and automatically.
 
 #### Define a rule manually
 
-    from dsgd import DSRule
-    DSC.model.add_rule(DSRule(lambda x: x[0] > 18, "Patient is adult"))
+    from dsgd import DSRule
+    DSC.model.add_rule(DSRule(lambda x: x[0] > 18, "Patient is adult"))
 
 In this case we use the method `add_rule` from our defined model. This
 method accepts a `DSRule` as an argument. A `DSRule` can be defined directly
@@ -97,7 +97,7 @@ The model provides methods to generate rules automatically based on 
 given parameters and statistics. The main two methods to generate rules
 are explained below.
 
-    DSC.model.generate_statistic_single_rules(X, breaks=3, 
+    DSC.model.generate_statistic_single_rules(X, breaks=3, 
                              column_names=names)
                              
 Given a sample of feature vectors (usually the same using for training)
@@ -105,7 +105,7 @@ and a number of breaks `n`, the model generates simple one-attribute 
 rules that separate each variable into `n+1` equal-number groups. Columns 
 names are optional and they are only used to generate the descriptions.
 
-    DSC.model.generate_mult_pair_rules(X, column_names=names)
+    DSC.model.generate_mult_pair_rules(X, column_names=names)
                              
 Given a sample of feature vectors (usually the same using for training).
 It creates a rule for each pair of attributes indicating whether they 
@@ -114,7 +114,7 @@ other below.
 
 ### Training
 
-    DSC.fit(X,y)
+    DSC.fit(X,y)
    
 The method `fit` given a set of feature vectors `X` and their 
 corresponding classes `y`, performs all the training of the model
@@ -131,13 +131,13 @@ time taken in every step.
 
 ### Predicting
 
-    y_pred = DSC.predict(X_new)
+    y_pred = DSC.predict(X_new)
 
 For predicting a set of new feature vectors `X_new`, the model provides
 the method `predict` which returns an array with the predicted classes
 for each feature vector (in the same notation as used in the fit method). 
 
-    y_score = DSC.predict_proba(X_new)
+    y_score = DSC.predict_proba(X_new)
 
 The model also provides the method `predict_proba` which instead of 
 returning a single value for each feature vector (the predicted class), it returns the 
@@ -145,7 +145,7 @@ estimated probability of belonging to each class.
 
 ### Interpretability
 
-    DSC.model.print_most_important_rules()
+    DSC.model.print_most_important_rules()
 
 The model can explain the decisions it makes. After training the model can
 show which of the defined rules are most important for the prediction
@@ -160,9 +160,9 @@ desirable to train the model every single time we perform a new experiment
 if we already have trained it. To handle this, the model provides methods 
 to save and load trained models from disk.
 
-    DSC.model.save_rules_bin("my_trained_model.dsb")
-    # ...
-    DSC.model.load_rules_bin("my_trained_model.dsb")
+    DSC.model.save_rules_bin("my_trained_model.dsb")
+    # ...
+    DSC.model.load_rules_bin("my_trained_model.dsb")
     
 Currently the model only saves the rules (lambdas and adjusted values). 
 However, the other configurations must be set every time. Note that the 
