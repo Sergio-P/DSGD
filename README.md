@@ -102,7 +102,7 @@ are explained below.
                              
 Given a sample of feature vectors (usually the same using for training)
 and a number of breaks `n`, the model generates simple one-attribute 
-rules that separate each variable into `n` equal-number groups. Columns 
+rules that separate each variable into `n+1` equal-number groups. Columns 
 names are optional and they are only used to generate the descriptions.
 
     DSC.model.generate_mult_pair_rules(X, column_names=names)
