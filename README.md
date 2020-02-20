@@ -98,7 +98,7 @@ given parameters and statistics. The main two methods to generate rules
 are explained below.
 
     DSC.model.generate_statistic_single_rules(X, breaks=3, 
-                             column_names=names)
+                                 column_names=names)
                              
 Given a sample of feature vectors (usually the same using for training)
 and a number of breaks `n`, the model generates simple one-attribute 
