@@ -10,9 +10,9 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 from sklearn.preprocessing import Imputer
 
-from ds.DSClassifierMulti import DSClassifierMulti
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
-from ds.DSRule import DSRule
+from dsgd.DSClassifierMulti import DSClassifierMulti
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSRule import DSRule
 
 data_raw = pd.read_csv("data/stroke_data_18.csv")
 

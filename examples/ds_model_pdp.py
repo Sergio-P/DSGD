@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
 
 data = pd.read_csv("data/stroke_data_18.csv")
 

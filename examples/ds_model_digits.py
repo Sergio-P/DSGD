@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 
-from ds.DSClassifierMulti import DSClassifierMulti
+from dsgd.DSClassifierMulti import DSClassifierMulti
 
 data = pd.read_csv("data/digits.csv", header=None)
 data = data.rename(columns={64: "cls"})

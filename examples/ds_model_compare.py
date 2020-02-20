@@ -11,7 +11,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
 
 DATASETS = ["iris", "breast-cancer-wisconsin", "wine", "SAheart", "digits", "gas_drift"]
 

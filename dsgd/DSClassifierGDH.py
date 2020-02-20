@@ -1,7 +1,7 @@
 from sklearn.base import ClassifierMixin
 
-from ds.core import compute_gradient_dempster_rule
-from ds.utils import normalize
+from dsgd.core import compute_gradient_dempster_rule
+from dsgd.utils import normalize
 
 
 class DSClassifierGDH(ClassifierMixin):

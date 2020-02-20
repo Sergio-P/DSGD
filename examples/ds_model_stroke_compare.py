@@ -11,7 +11,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.impute import SimpleImputer as Imputer
 from sklearn.svm import SVC
 
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
 
 data = pd.read_csv("data/stroke_data_18.csv")
 

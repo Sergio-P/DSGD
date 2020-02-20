@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-from ds.core import compute_gradient_dempster_rule
+from dsgd.core import compute_gradient_dempster_rule
 
 ax = random.random() * 0.5
 ay = random.random() * 0.5

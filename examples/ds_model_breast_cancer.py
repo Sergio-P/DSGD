@@ -2,8 +2,8 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
 from sklearn.metrics import roc_auc_score
 
-from ds.DSClassifierMulti import DSClassifierMulti
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMulti import DSClassifierMulti
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
 
 data = pd.read_csv("data/breast-cancer-wisconsin.csv")
 

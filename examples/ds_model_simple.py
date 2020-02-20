@@ -3,7 +3,7 @@ import torch
 import matplotlib.pyplot as plt
 from torch.autograd import Variable
 from torch.nn import MSELoss, CrossEntropyLoss
-from ds.DSModel import DSModel
+from dsgd.DSModel import DSModel
 
 
 model = DSModel()

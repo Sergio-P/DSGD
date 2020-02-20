@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.autograd import Variable
 
-from ds.core import dempster_rule_t
+from dsgd.core import dempster_rule_t
 
 
 class DSClassifierGDSimple(nn.Module):

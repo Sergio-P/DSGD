@@ -8,8 +8,8 @@ from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
-from ds.DSRule import DSRule
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSRule import DSRule
 
 # CONFIG
 # np.random.seed(123)

@@ -7,9 +7,9 @@ import numpy as np
 from scipy.stats import norm
 from torch.nn import Softmax
 
-from ds.DSRule import DSRule
-from ds.core import dempster_rule_kt, create_random_maf_k
-from ds.utils import is_categorical
+from dsgd.DSRule import DSRule
+from dsgd.core import dempster_rule_kt, create_random_maf_k
+from dsgd.utils import is_categorical
 
 
 class DSModelMulti(nn.Module):

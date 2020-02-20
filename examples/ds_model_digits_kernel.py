@@ -5,8 +5,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.metrics import confusion_matrix
 
-from ds.DSClassifierMulti import DSClassifierMulti
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMulti import DSClassifierMulti
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
 
 X_train = np.loadtxt("data/digits_kernels/x_train.csv", delimiter=",")
 X_test = np.loadtxt("data/digits_kernels/x_test.csv", delimiter=",")

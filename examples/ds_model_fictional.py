@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-from ds.DSClassifierGD import DSClassifier
+from dsgd.DSClassifierGD import DSClassifier
 
 N = 1000
 k = 3

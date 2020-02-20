@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.metrics import confusion_matrix
 
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
-from ds.DSClassifierMulti import DSClassifierMulti
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMulti import DSClassifierMulti
 
 dataset = sys.argv[1] if len(sys.argv) > 1 else input("Dataset: ")
 data = pd.read_csv(dataset)

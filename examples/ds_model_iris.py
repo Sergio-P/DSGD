@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 
-from ds.DSClassifierGD import DSClassifier
+from dsgd.DSClassifierGD import DSClassifier
 
 data = pd.read_csv("data/iris.csv")
 data = data[data.species != "versicolor"].reset_index(drop=True)  # Remove virginica to make the problem binary

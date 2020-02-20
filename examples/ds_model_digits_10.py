@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.metrics import confusion_matrix
 
-from ds.DSClassifierMulti import DSClassifierMulti
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMulti import DSClassifierMulti
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
 
 data = pd.read_csv("data/digits.csv", header=None)
 data = data.rename(columns={64: "cls"})

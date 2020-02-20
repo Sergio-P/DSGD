@@ -7,7 +7,7 @@ from sklearn.base import ClassifierMixin
 from torch.autograd import Variable
 from torch.utils.data.sampler import WeightedRandomSampler
 
-from ds.DSModelMultiQ import DSModelMultiQ
+from dsgd.DSModelMultiQ import DSModelMultiQ
 
 
 class DSClassifierMultiQ(ClassifierMixin):

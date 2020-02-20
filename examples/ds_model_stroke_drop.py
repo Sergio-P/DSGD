@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
 
 data = pd.read_csv("data/stroke_data_18.csv")
 

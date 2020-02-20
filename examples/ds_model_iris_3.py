@@ -3,7 +3,7 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import cross_validate, cross_val_score
 
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
 
 data = pd.read_csv("data/iris.csv")
 data = data.sample(frac=1).reset_index(drop=True)

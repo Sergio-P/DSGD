@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 
-from ds.DSClassifierMulti import DSClassifierMulti
-from ds.DSClassifierMultiQ import DSClassifierMultiQ
+from dsgd.DSClassifierMulti import DSClassifierMulti
+from dsgd.DSClassifierMultiQ import DSClassifierMultiQ
 
 data = pd.read_csv("data/iris.csv")
 data = data.sample(frac=1).reset_index(drop=True)

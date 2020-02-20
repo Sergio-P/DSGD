@@ -5,8 +5,8 @@ from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 
-from ds.DSClassifierGD import DSClassifier
-from ds.DSRule import DSRule
+from dsgd.DSClassifierGD import DSClassifier
+from dsgd.DSRule import DSRule
 
 data = pd.read_csv("data/stroke_data.csv")
 

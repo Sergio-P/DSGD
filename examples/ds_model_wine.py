@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from torch.autograd import Variable
 from torch.nn import CrossEntropyLoss, MSELoss
 
-from ds.DSModel import DSModel
+from dsgd.DSModel import DSModel
 
 data = pd.read_csv("data/wine.csv")
 # data = pd.concat([data[data["color"] == "red"].sample(n=1200),

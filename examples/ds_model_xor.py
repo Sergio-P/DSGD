@@ -7,8 +7,8 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from torch.autograd import Variable
 from torch.nn import CrossEntropyLoss, MSELoss
 
-from ds.DSModel import DSModel
-from ds.DSRule import DSRule
+from dsgd.DSModel import DSModel
+from dsgd.DSRule import DSRule
 
 X = np.random.rand(400, 2) * 2 - np.ones((400, 2))
 y = np.logical_xor(X[:, 0] > 0, X[:, 1] > 0).astype(int)

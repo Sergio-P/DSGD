@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
 from sklearn.metrics import roc_auc_score
 
-from ds.DSClassifierMulti import DSClassifierMulti
+from dsgd.DSClassifierMulti import DSClassifierMulti
 
 data = pd.read_csv("data/wine.csv")
 data["color"] = data["color"].map({"red": 0, "white": 1})

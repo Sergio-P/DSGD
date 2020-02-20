@@ -1,52 +1,49 @@
 import torch
-import dill
-#  import pickle
+# import dill
+import pickle
 from torch import nn
+from torch.autograd import Variable
 import numpy as np
 from scipy.stats import norm
+from torch.nn import Softmax
 
-from ds.DSRule import DSRule
-from ds.core import create_random_maf_k
-from ds.utils import is_categorical
+from dsgd.DSRule import DSRule
+from dsgd.core import dempster_rule_t, create_random_maf
+from dsgd.utils import is_categorical
 
 
-class DSModelMultiQ(nn.Module):
+class DSModel(nn.Module):
     """
-    Torch module implementation of DS General Classification
+    Torch module implementation of DS Binary Classifier
     """
 
-    def __init__(self, k, precompute_rules=False):
+    def __init__(self, use_softmax=True, skip_dr_norm=False):
         """
         Creates an empty DS Model
         """
-        super(DSModelMultiQ, self).__init__()
-        self._params = []
+        super(DSModel, self).__init__()
+        self.masses = []
         self.preds = []
         self.n = 0
-        self.k = k
-        self.precompute_rules = precompute_rules
-        self.rmap = {}
-        self.active_rules = []
+        self.use_softmax = use_softmax
+        self.skip_dr_norm = skip_dr_norm
+        if use_softmax:
+            self.sm = Softmax(dim=0)
 
-    def add_rule(self, pred, m_sing=None, m_uncert=None):
+    def add_rule(self, pred, ma=None, mb=None, mab=None):
         """
         Adds a rule to the model. If no masses are provided, random masses will be used.
         :param pred: DSRule or lambda or callable, used as the predicate of the rule
-        :param m_sing: [optional] masses for singletons
-        :param m_uncert: [optional] mass for uncertainty
+        :param ma: [optional] mass for first element
+        :param mb: [optional] mass for second element
+        :param mab: [optional] mass for uncertainty
         :return:
         """
         self.preds.append(pred)
         self.n += 1
-        if m_sing is None or m_uncert is None or len(m_sing) != self.k:
-            masses = create_random_maf_k(self.k, 0.8)
-        else:
-            masses = m_sing + [m_uncert]
-        m = torch.tensor(masses, requires_grad=True, dtype=torch.float)
-        self._params.append(m)
-        # self.masses = torch.cat((self.masses, m.view(1, self.k + 1)))
-        # print(m.grad)
-        # self.masses.retain_grad()
+        if ma is None or mb is None or mab is None:
+            _, ma, mb, mab = create_random_maf()
+        self.masses.append(Variable(torch.Tensor([[ma], [mb], [mab]]), requires_grad=True))
 
     def forward(self, X):
         """
@@ -54,78 +51,40 @@ class DSModelMultiQ(nn.Module):
         :param X: Set of inputs
         :return: Set of prediction for each input in one hot encoding format
         """
-        out = torch.zeros(len(X), self.k)
-        ms = torch.stack(self._params)
+        out = []
         for i in range(len(X)):
-            sel = self._select_rules(X[i, 1:], int(X[i, 0].item()))
+            sel = self._select_rules(X[i])
             if len(sel) == 0:
-                # raise RuntimeError("No rule especified for input No %d" % i)
-                # print("Warning: No rule especified for input No %d" % i)
-                out[i] = torch.ones((self.k,)) / self.k
+                raise RuntimeError("No rule especified for input No %d" % i)
             else:
-                mt = torch.index_select(ms, 0, torch.LongTensor(sel))
-                qt = mt[:, :-1] + mt[:, -1].view(-1, 1) * torch.ones_like(mt[:, :-1])
-                res = qt.prod(0)
-                # if torch.isnan(res).any():
-                #     print(self._params)
-                #     print(mt)
-                #     print(qt)
-                #     print(res)
-                #     raise RuntimeError("NaN found in computation")
-                if res.sum().item() <= 1e-16:
-                    res = res + 1e-16
-                    out[i] = res / res.sum()
+                mf = self.masses[sel[0]]
+                for j in range(1, len(sel)):
+                    mf = dempster_rule_t(mf, self.masses[sel[j]], not self.skip_dr_norm)
+                if self.use_softmax:
+                    res = self.sm(mf[:2])
                 else:
-                    out[i] = res / res.sum()
-        return out
-
-    def clear_rmap(self):
-        self.rmap = {}
+                    res = (mf[:2] / torch.sum(mf[:2])).view(2)
+                out.append(res)
+        return torch.cat(out).view(len(X), 2)
 
     def normalize(self):
         """
         Normalize all masses in order to keep constraints of DS
         """
-        with torch.no_grad():
-            for t in self._params:
-                t.clamp_(0., 1.)
-                # if t.sum().item() <= 1e-16:
-                #     print(t)
-                #     raise RuntimeError("Zero vector found")
-                if t.sum().item() < 1:
-                    # print("AAAA")
-                    t[-1].add_(1 - t.sum())
-                else:
-                    t.div_(t.sum())
-        # self.masses.clamp_(0., 1.)
-        # self.masses.div_(self.masses.sum(1).view(-1,1))
+        for mass in self.masses:
+            mass.data.clamp_(0., 1.)
+            if self.use_softmax:
+                mass = self.sm(mass)
+            else:
+                mass.data.div_(torch.sum(mass.data))
 
-    def check_nan(self, tag=""):
-        for p in self._params:
-            if torch.isnan(p).any():
-                print(p)
-                raise RuntimeError("NaN mass found at %s" % tag)
-            if p.grad is not None and torch.isnan(p.grad).any():
-                print(p)
-                print(p.grad)
-                raise RuntimeError("NaN grad mass found at %s" % tag)
-
-    def _select_rules(self, x, index=None):
-        if self.precompute_rules and index in self.rmap:
-            return self.rmap[index]
+    def _select_rules(self, x):
         x = x.data.numpy()
         sel = []
         for i in range(self.n):
-            if len(self.active_rules) > 0 and i not in self.active_rules:
-                continue
             if self.preds[i](x):
                 sel.append(i)
-        if self.precompute_rules and index is not None:
-            self.rmap[index] = sel
         return sel
-
-    def parameters(self, recurse=True):
-        return self._params
 
     def extra_repr(self):
         """
@@ -135,56 +94,43 @@ class DSModelMultiQ(nn.Module):
         builder = "DS Classifier using %d rules\n" % self.n
         for i in range(self.n):
             ps = str(self.preds[i])
-            ms = self._params[i]
-            builder += "\nRule %d: %s\n\t" % (i+1, ps)
-            for j in range(len(ms) - 1):
-                builder += "C%d: %.3f\t" % (j+1, ms[j])
-            builder += "Unc: %.3f\n" % ms[self.k]
+            ms = self.masses[i]
+            builder += "\nRule %d: %s\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % (i+1, ps, ms[0], ms[1], ms[2])
         return builder[:-1]
 
-    def find_most_important_rules(self, classes=None, threshold=0.2):
+    def find_most_important_rules(self, classes=None, threshold=0.2, class_names=None):
         """
         Shows the most contributive rules for the classes specified
         :param classes: Array of classes, by default shows all clases
         :param threshold: score minimum value considered to be contributive
-        :return: A list containing the information about most important rules
+        :return: A string containing the information about most important rules
         """
+        builder = "Most important rules\n"
         if classes is None:
-            classes = [i for i in range(self.k)]
+            classes = [0, 1]
 
-        with torch.no_grad():
-            rules = {}
-            for j in range(len(classes)):
-                cls = classes[j]
-                found = []
-                for i in range(len(self._params)):
-                    ms = self._params[i].detach().numpy()
-                    score = (ms[j]) * (1 - ms[-1])
-                    if score >= threshold * threshold:
-                        ps = str(self.preds[i])
-                        found.append((score, i, ps, np.sqrt(score), ms))
+        if class_names is None:
+            class_names = [str(i) for i in range(2)]
 
-                found.sort(reverse=True)
-                rules[cls] = found
+        for cls in classes:
+            builder += "\n For class %s\n" % class_names[cls]
+            found = []
+            for i in range(len(self.masses)):
+                ms = self.masses[i]
+                score = ((.1 + ms[cls]) / (.1 + ms[1 - cls]) - 1) * (1 - ms[-1]) / 10.
+                if score >= threshold * threshold:
+                    ps = str(self.preds[i])
+                    found.append((score, "  Rule %d: %s (%.3f)\n\t A: %.3f\t B: %.3f\tA,B: %.3f\n" % \
+                                (i + 1, ps, np.sqrt(score.detach().numpy()), ms[0], ms[1], ms[2])))
 
-        return rules
+            found.sort(reverse=True)
+            if len(found) == 0:
+                builder += "   No rules found\n"
 
-    def print_most_important_rules(self, classes=None, threshold=0.2):
-        rules = self.find_most_important_rules(classes, threshold)
+            for rule in found:
+                builder += rule[1]
 
-        if classes is None:
-            classes = [i for i in range(self.k)]
-
-        builder = ""
-        for i in range(len(classes)):
-            rs = rules[classes[i]]
-            builder += "\n\nMost important rules for class %s" % classes[i]
-            for r in rs:
-                builder += "\n\n\t[%.3f] R%d: %s\n\t\t" % (r[3], r[1], r[2])
-                masses = r[4]
-                for j in range(len(masses)):
-                    builder += "\t%s: %.3f" % (str(classes[j])[:3] if j < len(classes) else "Unc", masses[j])
-        print(builder)
+        return builder[:-1]
 
     def generate_statistic_single_rules(self, X, breaks=2, column_names=None):
         """
@@ -204,6 +150,8 @@ class DSModelMultiQ(nn.Module):
         for i in range(len(mean)):
             if is_categorical(X[:,i]):
                 categories = np.unique(X[:,i][~np.isnan(X[:,i])])
+                if len(categories) <= 1:
+                    continue
                 for cat in categories:
                     self.add_rule(DSRule(lambda x, i=i, k=cat: x[i] == k, "%s = %s" % (column_names[i], str(cat))))
             else:
@@ -303,12 +251,12 @@ class DSModelMultiQ(nn.Module):
         for gv, gname, breaks in [(0, "Men", breaks_men), (1, "Women", breaks_women)]:
             v = breaks[0]
             # First rule
-            self.add_rule(DSRule(lambda x, i=i, v=v, g=g, gv=gv: x[g] == gv and x[i] <= v, "%s: %s < %.3f" % (gname, name, v)))
+            self.add_rule(DSRule(lambda x, i=i, g=g, gv=gv, v=v: x[g] == gv and x[i] <= v, "%s: %s < %.3f" % (gname, name, v)))
             # Mid rules
             for j in range(1, len(breaks)):
                 vl = v
                 v = breaks[j]
-                self.add_rule(DSRule(lambda x, i=i, g=g, gv=gv, vl=vl, v=v: x[g] == gv and vl <= x[i] < v, "%s: %.3f < %s < %.3f" %
+                self.add_rule(DSRule(lambda x, i=i, g=g, gv=gv, v=v: x[g] == gv and vl <= x[i] < v, "%s: %.3f < %s < %.3f" %
                                      (gname, vl, name, v)))
             # Last rule
             self.add_rule(DSRule(lambda x, i=i, g=g, gv=gv, v=v: x[g] == gv and x[i] > v, "%s: %s > %.3f" % (gname, name, v)))
@@ -345,44 +293,21 @@ class DSModelMultiQ(nn.Module):
         Loads rules from a file, it deletes previous rules
         :param filename: The name of the input file
         """
-        with open(filename, "rb") as f:
-            sv = dill.load(f)
+        with open(filename) as f:
+            sv = pickle.load(f)
             self.preds = sv["preds"]
-            self._params = sv["masses"]
-            self.n = len(self.preds)
+            self.masses = sv["masses"]
 
-        # print(self.preds)
+        print(self.preds)
 
     def save_rules_bin(self, filename):
         """
         Saves the current rules into a file
         :param filename: The name of the file
         """
-        with open(filename, "wb") as f:
-            sv = {"preds": self.preds, "masses": self._params}
-            dill.dump(sv, f)
+        with open(filename, "w") as f:
+            sv = {"preds": self.preds, "masses": self.masses}
+            pickle.dump(sv, f, pickle.HIGHEST_PROTOCOL)
 
     def get_rules_size(self):
         return self.n
-
-    def get_active_rules_size(self):
-        return len(self.active_rules)
-
-    def get_rules_by_instance(self, x, order_by=0):
-        sel = self._select_rules(x)
-        rules = np.zeros((len(sel), self.k + 1))
-        for i in range(len(sel)):
-            rules[i, :] = self.masses[sel[i]].data.numpy()
-        rules = rules[np.lexsort((rules[:, order_by],))]
-        return rules
-
-    def keep_top_rules(self, n=5, imbalance=None):
-        rd = self.find_most_important_rules()
-        rs = []
-        for k in rd:
-            if imbalance is None:
-                rs.extend(rd[k][:n])
-            else:
-                rs.extend(rd[k][:round(n*imbalance[k])])
-        rids = [r[1] for r in rs]
-        self.active_rules = rids

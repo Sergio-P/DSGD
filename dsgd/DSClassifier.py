@@ -7,7 +7,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 
 from core import create_full_uncertainty, cls_max, dempster_rule, cls_score, cls_pla_score, cls_pla_max
-from ds.utils import statistic_breaks, is_categorical
+from dsgd.utils import statistic_breaks, is_categorical
 
 
 class DSClassifier(ClassifierMixin):
