@@ -186,22 +186,31 @@ class DSModelMultiQ(nn.Module):
                     builder += "\t%s: %.3f" % (str(classes[j])[:3] if j < len(classes) else "Unc", masses[j])
         print(builder)
 
-    def generate_statistic_single_rules(self, X, breaks=2, column_names=None):
+    def generate_statistic_single_rules(self, X, breaks=2, column_names=None, generated_columns=None):
         """
         Populates the model with attribute-independant rules based on statistical breaks.
         In total this method generates No. attributes * (breaks + 1) rules
         :param X: Set of inputs (can be the same as training or a sample)
         :param breaks: Number of breaks per attribute
         :param column_names: Column attribute names
+        :param generated_columns: array of booleans with len() = num_features representing which
+            will have rules generated. The default behaviour is to generate rules for all
         """
         mean = np.nanmean(X, axis=0)
         std = np.nanstd(X, axis=0)
         brks = norm.ppf(np.linspace(0,1,breaks+2))[1:-1]
+        num_features = len(mean)
+
+        if generated_columns is None:
+            generated_columns = np.repeat(True, num_features)
+        assert generated_columns.shape == (num_features,), "generated_columns has wrong shape {}".format(generated_columns.shape)
 
         if column_names is None:
-            column_names = ["X[%d]" % i for i in range(len(mean))]
+            column_names = ["X[%d]" % i for i in range(num_features)]
 
-        for i in range(len(mean)):
+        for i in range(num_features):
+            if not generated_columns[i]:
+                continue
             if is_categorical(X[:,i]):
                 categories = np.unique(X[:,i][~np.isnan(X[:,i])])
                 for cat in categories:
