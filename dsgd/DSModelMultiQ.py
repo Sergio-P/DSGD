@@ -27,6 +27,7 @@ class DSModelMultiQ(nn.Module):
         self.precompute_rules = precompute_rules
         self.rmap = {}
         self.active_rules = []
+        self._all_rules = None
 
     def add_rule(self, pred, m_sing=None, m_uncert=None):
         """
@@ -48,7 +49,7 @@ class DSModelMultiQ(nn.Module):
         # print(m.grad)
         # self.masses.retain_grad()
 
-    def forward(self, X):
+    def forward_antiguo(self, X):
         """
         Defines the computation performed at every call. Applying Dempster Rule for combining.
         :param X: Set of inputs
@@ -79,8 +80,38 @@ class DSModelMultiQ(nn.Module):
                     out[i] = res / res.sum()
         return out
 
+    def forward(self, X):
+        """
+        Defines the computation performed at every call. Applying Dempster Rule for combining.
+        :param X: Set of inputs
+        :return: Set of prediction for each input in one hot encoding format
+        """
+        ms = torch.stack(self._params)
+        # transform to commonalities before selecting the rules that apply
+        qs = ms[:, :-1] + ms[:, -1].view(-1, 1) * torch.ones_like(ms[:, :-1])
+        qt = qs.repeat(len(X), 1, 1)
+        sel = self._select_all_rules(X)
+        # replace rules that don't apply with ones
+        qt[~sel] = 1
+        res = qt.prod(1)
+        out = res / res.sum(1, keepdim=True)
+        # TODO do the 1e-16 fix
+        return out
+
     def clear_rmap(self):
         self.rmap = {}
+        self._all_rules = None
+
+    def _select_all_rules(self, X):
+        if self._all_rules is not None:
+            return self._all_rules
+        sel = torch.zeros(len(X), self.n, dtype=torch.bool)
+        for i, sample in enumerate(X):
+            for j in range(self.n):
+                sel[i, j] = self.preds[j](sample[1:])
+        if self.precompute_rules:
+            self._all_rules = sel
+        return sel
 
     def normalize(self):
         """
