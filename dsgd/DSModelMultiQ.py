@@ -75,9 +75,10 @@ class DSModelMultiQ(nn.Module):
         if self._all_rules is not None:
             return self._all_rules
         sel = torch.zeros(len(X), self.n, dtype=torch.bool)
+        X = X.data.numpy()
         for i, sample in enumerate(X):
             for j in range(self.n):
-                sel[i, j] = self.preds[j](sample[1:])
+                sel[i, j] = bool(self.preds[j](sample[1:]))
         if self.precompute_rules:
             self._all_rules = sel
         return sel
