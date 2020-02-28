@@ -49,37 +49,6 @@ class DSModelMultiQ(nn.Module):
         # print(m.grad)
         # self.masses.retain_grad()
 
-    def forward_antiguo(self, X):
-        """
-        Defines the computation performed at every call. Applying Dempster Rule for combining.
-        :param X: Set of inputs
-        :return: Set of prediction for each input in one hot encoding format
-        """
-        out = torch.zeros(len(X), self.k)
-        ms = torch.stack(self._params)
-        for i in range(len(X)):
-            sel = self._select_rules(X[i, 1:], int(X[i, 0].item()))
-            if len(sel) == 0:
-                # raise RuntimeError("No rule especified for input No %d" % i)
-                # print("Warning: No rule especified for input No %d" % i)
-                out[i] = torch.ones((self.k,)) / self.k
-            else:
-                mt = torch.index_select(ms, 0, torch.LongTensor(sel))
-                qt = mt[:, :-1] + mt[:, -1].view(-1, 1) * torch.ones_like(mt[:, :-1])
-                res = qt.prod(0)
-                # if torch.isnan(res).any():
-                #     print(self._params)
-                #     print(mt)
-                #     print(qt)
-                #     print(res)
-                #     raise RuntimeError("NaN found in computation")
-                if res.sum().item() <= 1e-16:
-                    res = res + 1e-16
-                    out[i] = res / res.sum()
-                else:
-                    out[i] = res / res.sum()
-        return out
-
     def forward(self, X):
         """
         Defines the computation performed at every call. Applying Dempster Rule for combining.
