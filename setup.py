@@ -19,6 +19,7 @@ setuptools.setup(
         'numpy',
         'pandas',
         'scikit-learn',
-        'torch'
+        'torch',
+        'dill'
     ]
 )
