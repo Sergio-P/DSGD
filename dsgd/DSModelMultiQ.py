@@ -64,7 +64,7 @@ class DSModelMultiQ(nn.Module):
         vectors, indices = X[:, 1:], X[:, 0].long()
         sel = self._select_all_rules(vectors, indices)
         # replace rules that don't apply with ones
-        qt[~sel] = 1
+        qt[sel] = 1
         res = qt.prod(1)
         out = res / res.sum(1, keepdim=True)
         # TODO do the 1e-16 fix
@@ -79,6 +79,7 @@ class DSModelMultiQ(nn.Module):
         This works based on the assumption that indices will be
         provided in order. Otherwise, the function may return uninitialized
         values.
+        :return a bool tensor with shape (len(X), num_rules) with Trues for the rules that don't apply
         """
         if self._all_rules is None:
             self._all_rules = torch.zeros(0, self.n, dtype=torch.bool)
@@ -94,7 +95,7 @@ class DSModelMultiQ(nn.Module):
         X = X.data.numpy()
         for i, sample, index in zip(count(), X, indices):
             for j in range(self.n):
-                sel[i, j] = bool(self.preds[j](sample))
+                sel[i, j] = not bool(self.preds[j](sample))
             self._all_rules[index] = sel[i]
         return sel
 
