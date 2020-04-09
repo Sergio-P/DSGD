@@ -66,8 +66,9 @@ class DSModelMultiQ(nn.Module):
         # replace rules that don't apply with ones
         qt[sel] = 1
         res = qt.prod(1)
+        res2 = res.clone()
+        res[res2.sum(1) <= 1e-16] += 1e-16
         out = res / res.sum(1, keepdim=True)
-        # TODO do the 1e-16 fix
         return out
 
     def clear_rmap(self):
