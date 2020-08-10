@@ -28,7 +28,7 @@ X_test = data.iloc[cut:, :-1].values
 y_test = data.iloc[cut:, -1].values
 
 
-DSC = DSClassifierMultiQ(2, min_iter=20, max_iter=100, debug_mode=True, num_workers=4, lossfn="MSE", optim="adam",
+DSC = DSClassifierMultiQ(2, min_iter=1, max_iter=1, debug_mode=True, num_workers=4, lossfn="MSE", optim="adam",
                          precompute_rules=True, batch_size=200, lr=0.002)
 
 # Add custom rules
@@ -92,8 +92,11 @@ ranges = [
 
 # DSC.model.generate_outside_range_pair_rules(data.columns[:-1], ranges)
 
-losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=False, add_mult_rules=False, print_every_epochs=1,
+losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=False, add_mult_rules=True, print_every_epochs=1,
                             print_epoch_progress=True)
+
+print("Num of parameters: %d" % sum(p.numel() for p in DSC.model.parameters() if p.requires_grad))
+exit()
 
 DSC.model.save_rules_bin("stroke_single.dsb")
 

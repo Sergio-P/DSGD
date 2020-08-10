@@ -29,7 +29,10 @@ y_test = data.iloc[:, -1].values
 
 DSC = DSClassifierMultiQ(2, min_iter=50, max_iter=100, debug_mode=True, num_workers=4, lossfn="MSE", optim="adam",
                          precompute_rules=True, batch_size=200, lr=0.005)
-DSC.model.load_rules_bin("stroke2.dsb")
+DSC.model.load_rules_bin("models/stroke2.dsb")
+
+print("Num of parameters: %d" % sum(p.numel() for p in DSC.model.parameters() if p.requires_grad))
+exit()
 
 y_score = DSC.predict_proba(X_test)
 _, y_pred = torch.max(torch.Tensor(y_score), 1)

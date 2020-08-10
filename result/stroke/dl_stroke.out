@@ -1,0 +1,42 @@
+##################################################
+DSGD
+Num of parameters: 1674
+Accuracy: 85.8%
+Confusion Matrix:
+[[17844   719]
+ [ 2473  1384]]
+AUC score: 0.865
+##################################################
+CAT ENCODER
+Processing epoch 200 	 Loss: 0.1657
+
+Accuracy Train: 92.6%
+
+
+Training Time: 197.9
+Num of parameters: 4628
+Accuracy: 89.6%
+Confusion Matrix:
+[[17647   916]
+ [ 1406  2451]]
+AUC score: 0.909
+##################################################
+ATTR ENCODER
+
+Removed bmis too many missing values
+Removed body_fat too many missing values
+Removed body_weights too many missing values
+Removed heights too many missing values
+Removed waist_measurements too many missing values
+Processing epoch 200 	 Loss: 0.1657
+
+Accuracy Train: 94.4%
+
+
+Training Time: 363.0
+Num of parameters: 5892
+Accuracy: 91.0%
+Confusion Matrix:
+[[18094   469]
+ [ 1557  2300]]
+AUC score: 0.922
