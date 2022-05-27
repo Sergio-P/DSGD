@@ -378,15 +378,27 @@ class DSClassifierMultiQ(ClassifierMixin):
         """
         pred = self.predict_proba([x])[0]
         cls = np.argmax(pred)
-        rls = self.model.get_rules_by_instance(x, order_by=cls)
+        rls, prds = self.model.get_rules_by_instance(x, order_by=cls)
 
         # String interpretation
-        builder = "DS Model predicts class %d\n" % cls
-        for i in range(len(pred)-1):
-            builder += " Class %d: \t%.3f\n" % (i, pred[i])
-        builder += " Uncertainty:\t%.3f\n\n" % pred[-1]
-        for i in range(min(len(rls), 5)):
-            builder += " "
-        return pred, cls, rls, builder
+        builder = "DS Model predicts class %d\n" % (cls + 1)
+        cols = ["rule"]
+        for i in range(len(pred)):
+            builder += " Class %d: \t%.3f\n" % (i+1, pred[i])
+            cols.append("mass_class_" + str(i+1))
+        # builder += " Uncertainty:\t%.3f\n\n" % pred[-1]
+        cols.append("uncertainty")
+        
+        df_rls = pd.DataFrame(rls)
+        prds = [str(p) for p in prds]
+        df_rls.insert(0, "rule", prds)
+        df_rls = df_rls.loc[::-1].reset_index(drop=True)
+        df_rls.columns = cols
 
+        return pred, cls, df_rls, builder
 
+    def print_most_important_rules(self, classes=None, threshold=0.2):
+        return self.model.print_most_important_rules(classes, threshold)
+
+    def find_most_important_rules(self, classes=None, threshold=0.2):
+        return self.model.find_most_important_rules(classes, threshold)

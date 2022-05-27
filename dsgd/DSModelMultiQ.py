@@ -378,12 +378,18 @@ class DSModelMultiQ(nn.Module):
         return len(self.active_rules)
 
     def get_rules_by_instance(self, x, order_by=0):
+        x = torch.Tensor(x)
         sel = self._select_rules(x)
         rules = np.zeros((len(sel), self.k + 1))
+        preds = []
         for i in range(len(sel)):
-            rules[i, :] = self.masses[sel[i]].data.numpy()
+            rules[i, :] = self._params[sel[i]].data.numpy()
+            preds.append(self.preds[sel[i]])
+
+        preds = np.array(preds)
+        preds = preds[np.lexsort((rules[:, order_by],))]
         rules = rules[np.lexsort((rules[:, order_by],))]
-        return rules
+        return rules, preds
 
     def keep_top_rules(self, n=5, imbalance=None):
         rd = self.find_most_important_rules()
