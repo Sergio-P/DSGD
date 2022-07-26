@@ -5,9 +5,11 @@ from torch import nn
 import numpy as np
 from scipy.stats import norm
 
-from dsgd.DSRule import DSRule
-from dsgd.core import create_random_maf_k
-from dsgd.utils import is_categorical
+from .DSRule import DSRule
+from .core import create_random_maf_k
+from .utils import is_categorical
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 class DSModelMultiQ(nn.Module):
@@ -54,17 +56,17 @@ class DSModelMultiQ(nn.Module):
         :param X: Set of inputs
         :return: Set of prediction for each input in one hot encoding format
         """
-        out = torch.zeros(len(X), self.k)
-        ms = torch.stack(self._params)
+        out = torch.zeros(len(X), self.k).to(device)
+        ms = torch.stack(self._params).to(device)
         for i in range(len(X)):
             sel = self._select_rules(X[i, 1:], int(X[i, 0].item()))
             if len(sel) == 0:
                 # raise RuntimeError("No rule especified for input No %d" % i)
                 # print("Warning: No rule especified for input No %d" % i)
-                out[i] = torch.ones((self.k,)) / self.k
+                out[i] = torch.ones((self.k,)).to(device) / self.k
             else:
-                mt = torch.index_select(ms, 0, torch.LongTensor(sel))
-                qt = mt[:, :-1] + mt[:, -1].view(-1, 1) * torch.ones_like(mt[:, :-1])
+                mt = torch.index_select(ms, 0, torch.LongTensor(sel).to(device))
+                qt = mt[:, :-1] + mt[:, -1].view(-1, 1) * torch.ones_like(mt[:, :-1]).to(device)
                 res = qt.prod(0)
                 # if torch.isnan(res).any():
                 #     print(self._params)
@@ -113,7 +115,7 @@ class DSModelMultiQ(nn.Module):
     def _select_rules(self, x, index=None):
         if self.precompute_rules and index in self.rmap:
             return self.rmap[index]
-        x = x.data.numpy()
+        x = x.cpu().data.numpy()
         sel = []
         for i in range(self.n):
             if len(self.active_rules) > 0 and i not in self.active_rules:
@@ -378,7 +380,7 @@ class DSModelMultiQ(nn.Module):
         return len(self.active_rules)
 
     def get_rules_by_instance(self, x, order_by=0):
-        x = torch.Tensor(x)
+        x = torch.Tensor(x).to(device)
         sel = self._select_rules(x)
         rules = np.zeros((len(sel), self.k + 1))
         preds = []
