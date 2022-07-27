@@ -2,8 +2,10 @@ import torch
 import dill
 #  import pickle
 from torch import nn
+from torch.nn.functional import pad
 import numpy as np
 from scipy.stats import norm
+from itertools import count
 
 from .DSRule import DSRule
 from .core import create_random_maf_k
@@ -29,6 +31,7 @@ class DSModelMultiQ(nn.Module):
         self.precompute_rules = precompute_rules
         self.rmap = {}
         self.active_rules = []
+        self._all_rules = None
 
     def add_rule(self, pred, m_sing=None, m_uncert=None):
         """
@@ -56,33 +59,53 @@ class DSModelMultiQ(nn.Module):
         :param X: Set of inputs
         :return: Set of prediction for each input in one hot encoding format
         """
-        out = torch.zeros(len(X), self.k).to(device)
         ms = torch.stack(self._params).to(device)
-        for i in range(len(X)):
-            sel = self._select_rules(X[i, 1:], int(X[i, 0].item()))
-            if len(sel) == 0:
-                # raise RuntimeError("No rule especified for input No %d" % i)
-                # print("Warning: No rule especified for input No %d" % i)
-                out[i] = torch.ones((self.k,)).to(device) / self.k
-            else:
-                mt = torch.index_select(ms, 0, torch.LongTensor(sel).to(device))
-                qt = mt[:, :-1] + mt[:, -1].view(-1, 1) * torch.ones_like(mt[:, :-1]).to(device)
-                res = qt.prod(0)
-                # if torch.isnan(res).any():
-                #     print(self._params)
-                #     print(mt)
-                #     print(qt)
-                #     print(res)
-                #     raise RuntimeError("NaN found in computation")
-                if res.sum().item() <= 1e-16:
-                    res = res + 1e-16
-                    out[i] = res / res.sum()
-                else:
-                    out[i] = res / res.sum()
+        # transform to commonalities before selecting the rules that apply
+        qs = ms[:, :-1] + ms[:, -1].view(-1, 1) * torch.ones_like(ms[:, :-1])
+        qt = qs.repeat(len(X), 1, 1)
+        vectors, indices = X[:, 1:], X[:, 0].long()
+        sel = self._select_all_rules(vectors, indices)
+        # replace rules that don't apply with ones
+        qt[sel] = 1
+        # TODO Al parecer hay algun problema con el 1e-16, pero el arreglo anterior hace que el programa caiga.
+        # Se comenta el arreglo anterior y se propone uno nuevo
+        #res2 = res.clone()
+        #res[res2.sum(1) <= 1e-16] += 1e-16
+        temp_res = qt.prod(1)
+        res = torch.where(temp_res <= 1e-16,
+                          temp_res.add(1e-16), temp_res)
+        out = res / res.sum(1, keepdim=True)
         return out
 
     def clear_rmap(self):
         self.rmap = {}
+        self._all_rules = None
+
+    def _select_all_rules(self, X, indices):
+        """
+        This works based on the assumption that indices will be
+        provided in order. Otherwise, the function may return uninitialized
+        values.
+        :return a bool tensor with shape (len(X), num_rules) with Trues for the rules that don't apply
+        """
+        if self._all_rules is None:
+            self._all_rules = torch.zeros(
+                0, self.n, dtype=torch.bool).to(device)
+        max_index = torch.max(indices)
+        len_all_rules = len(self._all_rules)
+        if max_index < len_all_rules:
+            return self._all_rules[indices]
+        else:
+            desired_len = max_index + 1
+            padding = (0, 0, 0, desired_len-len_all_rules)
+            self._all_rules = pad(self._all_rules, padding)
+        sel = torch.zeros(len(X), self.n, dtype=torch.bool).to(device)
+        X = X.cpu().data.numpy()
+        for i, sample, index in zip(count(), X, indices):
+            for j in range(self.n):
+                sel[i, j] = not bool(self.preds[j](sample))
+            self._all_rules[index] = sel[i]
+        return sel
 
     def normalize(self):
         """
@@ -185,7 +208,8 @@ class DSModelMultiQ(nn.Module):
                 builder += "\n\n\t[%.3f] R%d: %s\n\t\t" % (r[3], r[1], r[2])
                 masses = r[4]
                 for j in range(len(masses)):
-                    builder += "\t%s: %.3f" % (str(classes[j])[:3] if j < len(classes) else "Unc", masses[j])
+                    builder += "\t%s: %.3f" % (
+                        str(classes[j])[:3] if j < len(classes) else "Unc", masses[j])
         print(builder)
 
     def generate_statistic_single_rules(self, X, breaks=2, column_names=None, generated_columns=None):
@@ -200,12 +224,13 @@ class DSModelMultiQ(nn.Module):
         """
         mean = np.nanmean(X, axis=0)
         std = np.nanstd(X, axis=0)
-        brks = norm.ppf(np.linspace(0,1,breaks+2))[1:-1]
+        brks = norm.ppf(np.linspace(0, 1, breaks+2))[1:-1]
         num_features = len(mean)
 
         if generated_columns is None:
             generated_columns = np.repeat(True, num_features)
-        assert generated_columns.shape == (num_features,), "generated_columns has wrong shape {}".format(generated_columns.shape)
+        assert generated_columns.shape == (
+            num_features,), "generated_columns has wrong shape {}".format(generated_columns.shape)
 
         if column_names is None:
             column_names = ["X[%d]" % i for i in range(num_features)]
@@ -213,21 +238,25 @@ class DSModelMultiQ(nn.Module):
         for i in range(num_features):
             if not generated_columns[i]:
                 continue
-            if is_categorical(X[:,i]):
-                categories = np.unique(X[:,i][~np.isnan(X[:,i])])
+            if is_categorical(X[:, i]):
+                categories = np.unique(X[:, i][~np.isnan(X[:, i])])
                 for cat in categories:
-                    self.add_rule(DSRule(lambda x, i=i, k=cat: x[i] == k, "%s = %s" % (column_names[i], str(cat))))
+                    self.add_rule(DSRule(lambda x, i=i, k=cat: x[i] == k, "%s = %s" % (
+                        column_names[i], str(cat))))
             else:
                 # First rule
                 v = mean[i] + std[i] * brks[0]
-                self.add_rule(DSRule(lambda x, i=i, v=v: x[i] <= v, "%s < %.3f" % (column_names[i], v)))
+                self.add_rule(
+                    DSRule(lambda x, i=i, v=v: x[i] <= v, "%s < %.3f" % (column_names[i], v)))
                 # Mid rules
                 for j in range(1, len(brks)):
                     vl = v
                     v = mean[i] + std[i] * brks[j]
-                    self.add_rule(DSRule(lambda x, i=i, vl=vl, v=v: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, column_names[i], v)))
+                    self.add_rule(DSRule(lambda x, i=i, vl=vl, v=v: vl <=
+                                  x[i] < v, "%.3f < %s < %.3f" % (vl, column_names[i], v)))
                 # Last rule
-                self.add_rule(DSRule(lambda x, i=i, v=v: x[i] > v, "%s > %.3f" % (column_names[i], v)))
+                self.add_rule(
+                    DSRule(lambda x, i=i, v=v: x[i] > v, "%s > %.3f" % (column_names[i], v)))
 
     def generate_categorical_rules(self, X, column_names=None, exclude=None):
         """
@@ -244,10 +273,11 @@ class DSModelMultiQ(nn.Module):
             exclude = []
 
         for i in range(m):
-            if is_categorical(X[:,i]) and column_names[i] not in exclude:
-                categories = np.unique(X[:,i][~np.isnan(X[:,i])])
+            if is_categorical(X[:, i]) and column_names[i] not in exclude:
+                categories = np.unique(X[:, i][~np.isnan(X[:, i])])
                 for cat in categories:
-                    self.add_rule(DSRule(lambda x, i=i, k=cat: x[i] == k, "%s = %s" % (column_names[i], str(cat))))
+                    self.add_rule(DSRule(lambda x, i=i, k=cat: x[i] == k, "%s = %s" % (
+                        column_names[i], str(cat))))
 
     def generate_mult_pair_rules(self, X, column_names=None, include_square=False):
         """
@@ -270,9 +300,9 @@ class DSModelMultiQ(nn.Module):
                 mi = mean[i]
                 mj = mean[j]
                 self.add_rule(DSRule(lambda x, i=i, j=j, mi=mi, mj=mj: (x[i] - mi) * (x[j] - mj) > 0,
-                                     "Positive %s - %.3f, %s - %.3f" % (column_names[i],mean[i],column_names[j],mean[j])))
+                                     "Positive %s - %.3f, %s - %.3f" % (column_names[i], mean[i], column_names[j], mean[j])))
                 self.add_rule(DSRule(lambda x, i=i, j=j, mi=mi, mj=mj: (x[i] - mi) * (x[j] - mj) <= 0,
-                                     "Negative %s - %.3f, %s - %.3f" % (column_names[i],mean[i],column_names[j],mean[j])))
+                                     "Negative %s - %.3f, %s - %.3f" % (column_names[i], mean[i], column_names[j], mean[j])))
 
     def generate_custom_range_single_rules(self, column_names, name, breaks):
         """
@@ -287,14 +317,17 @@ class DSModelMultiQ(nn.Module):
             raise NameError("Cannot find column with name %s" % name)
         v = breaks[0]
         # First rule
-        self.add_rule(DSRule(lambda x, i=i, v=v: x[i] <= v, "%s < %.3f" % (name, v)))
+        self.add_rule(
+            DSRule(lambda x, i=i, v=v: x[i] <= v, "%s < %.3f" % (name, v)))
         # Mid rules
         for j in range(1, len(breaks)):
             vl = v
             v = breaks[j]
-            self.add_rule(DSRule(lambda x, i=i, vl=vl, v=v: vl <= x[i] < v, "%.3f < %s < %.3f" % (vl, name, v)))
+            self.add_rule(DSRule(lambda x, i=i, vl=vl, v=v: vl <=
+                          x[i] < v, "%.3f < %s < %.3f" % (vl, name, v)))
         # Last rule
-        self.add_rule(DSRule(lambda x, i=i, v=v: x[i] > v, "%s > %.3f" % (name, v)))
+        self.add_rule(
+            DSRule(lambda x, i=i, v=v: x[i] > v, "%s > %.3f" % (name, v)))
 
     def generate_custom_range_rules_by_gender(self, column_names, name, breaks_men, breaks_women, gender_name="gender"):
         """
@@ -314,7 +347,8 @@ class DSModelMultiQ(nn.Module):
         for gv, gname, breaks in [(0, "Men", breaks_men), (1, "Women", breaks_women)]:
             v = breaks[0]
             # First rule
-            self.add_rule(DSRule(lambda x, i=i, v=v, g=g, gv=gv: x[g] == gv and x[i] <= v, "%s: %s < %.3f" % (gname, name, v)))
+            self.add_rule(DSRule(lambda x, i=i, v=v, g=g,
+                          gv=gv: x[g] == gv and x[i] <= v, "%s: %s < %.3f" % (gname, name, v)))
             # Mid rules
             for j in range(1, len(breaks)):
                 vl = v
@@ -322,7 +356,8 @@ class DSModelMultiQ(nn.Module):
                 self.add_rule(DSRule(lambda x, i=i, g=g, gv=gv, vl=vl, v=v: x[g] == gv and vl <= x[i] < v, "%s: %.3f < %s < %.3f" %
                                      (gname, vl, name, v)))
             # Last rule
-            self.add_rule(DSRule(lambda x, i=i, g=g, gv=gv, v=v: x[g] == gv and x[i] > v, "%s: %s > %.3f" % (gname, name, v)))
+            self.add_rule(DSRule(lambda x, i=i, g=g, gv=gv,
+                          v=v: x[g] == gv and x[i] > v, "%s: %s > %.3f" % (gname, name, v)))
 
     def generate_outside_range_pair_rules(self, column_names, ranges):
         """
@@ -343,13 +378,17 @@ class DSModelMultiQ(nn.Module):
                 hj = ranges[index_j][1]
                 # Add Rules
                 if not np.isnan(li) and not np.isnan(lj):
-                    self.add_rule(DSRule(lambda x, i=i, j=j, li=li, lj=lj: x[i] < li and x[j] < lj, "Low %s and Low %s" % (col_i, col_j)))
+                    self.add_rule(DSRule(
+                        lambda x, i=i, j=j, li=li, lj=lj: x[i] < li and x[j] < lj, "Low %s and Low %s" % (col_i, col_j)))
                 if not np.isnan(hi) and not np.isnan(lj):
-                    self.add_rule(DSRule(lambda x, i=i, j=j, hi=hi, lj=lj: x[i] > hi and x[j] < lj, "High %s and Low %s" % (col_i, col_j)))
+                    self.add_rule(DSRule(
+                        lambda x, i=i, j=j, hi=hi, lj=lj: x[i] > hi and x[j] < lj, "High %s and Low %s" % (col_i, col_j)))
                 if not np.isnan(hi) and not np.isnan(hj):
-                    self.add_rule(DSRule(lambda x, i=i, j=j, hi=hi, hj=hj: x[i] > hi and x[j] > hj, "High %s and High %s" % (col_i, col_j)))
+                    self.add_rule(DSRule(
+                        lambda x, i=i, j=j, hi=hi, hj=hj: x[i] > hi and x[j] > hj, "High %s and High %s" % (col_i, col_j)))
                 if not np.isnan(li) and not np.isnan(hj):
-                    self.add_rule(DSRule(lambda x, i=i, j=j, li=li, hj=hj: x[i] < li and x[j] > hj, "Low %s and High %s" % (col_i, col_j)))
+                    self.add_rule(DSRule(
+                        lambda x, i=i, j=j, li=li, hj=hj: x[i] < li and x[j] > hj, "Low %s and High %s" % (col_i, col_j)))
 
     def load_rules_bin(self, filename):
         """
