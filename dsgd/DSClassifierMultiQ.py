@@ -36,8 +36,8 @@ class DSClassifierMultiQ(ClassifierMixin):
         self.max_iter = max_iter
         self.batch_size = batch_size
         self.num_workers = num_workers
-        # TODO Ver como dejar esto, con CUDA no funciona bien con mas de 1 worker
-        if device.type == "cuda":
+        
+        if device.type == "cuda": # With CUDA more workers can make problemas
             self.num_workers = 0
         self.min_dJ = min_dloss
         self.balance_class_data = False
