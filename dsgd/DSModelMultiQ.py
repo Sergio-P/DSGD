@@ -67,13 +67,8 @@ class DSModelMultiQ(nn.Module):
         sel = self._select_all_rules(vectors, indices)
         # replace rules that don't apply with ones
         qt[sel] = 1
-        # TODO Al parecer hay algun problema con el 1e-16, pero el arreglo anterior hace que el programa caiga.
-        # Se comenta el arreglo anterior y se propone uno nuevo
-        #res2 = res.clone()
-        #res[res2.sum(1) <= 1e-16] += 1e-16
         temp_res = qt.prod(1)
-        res = torch.where(temp_res <= 1e-16,
-                          temp_res.add(1e-16), temp_res)
+        res = torch.where(temp_res <= 1e-16, temp_res.add(1e-16), temp_res)
         out = res / res.sum(1, keepdim=True)
         return out
 
