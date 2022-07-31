@@ -11,15 +11,13 @@ from .DSRule import DSRule
 from .core import create_random_maf_k
 from .utils import is_categorical
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 
 class DSModelMultiQ(nn.Module):
     """
     Torch module implementation of DS General Classification
     """
 
-    def __init__(self, k, precompute_rules=False):
+    def __init__(self, k, precompute_rules=False, device="cpu", force_precompute=False):
         """
         Creates an empty DS Model
         """
@@ -29,6 +27,8 @@ class DSModelMultiQ(nn.Module):
         self.n = 0
         self.k = k
         self.precompute_rules = precompute_rules
+        self.device = device
+        self.force_precompute = force_precompute
         self.rmap = {}
         self.active_rules = []
         self._all_rules = None
@@ -59,17 +59,43 @@ class DSModelMultiQ(nn.Module):
         :param X: Set of inputs
         :return: Set of prediction for each input in one hot encoding format
         """
-        ms = torch.stack(self._params).to(device)
-        # transform to commonalities before selecting the rules that apply
-        qs = ms[:, :-1] + ms[:, -1].view(-1, 1) * torch.ones_like(ms[:, :-1])
-        qt = qs.repeat(len(X), 1, 1)
-        vectors, indices = X[:, 1:], X[:, 0].long()
-        sel = self._select_all_rules(vectors, indices)
-        # replace rules that don't apply with ones
-        qt[sel] = 1
-        temp_res = qt.prod(1)
-        res = torch.where(temp_res <= 1e-16, temp_res.add(1e-16), temp_res)
-        out = res / res.sum(1, keepdim=True)
+        ms = torch.stack(self._params).to(self.device)
+        if self.force_precompute:
+            # transform to commonalities before selecting the rules that apply
+            qs = ms[:, :-1] + \
+                ms[:, -1].view(-1, 1) * torch.ones_like(ms[:, :-1])
+            qt = qs.repeat(len(X), 1, 1)
+            vectors, indices = X[:, 1:], X[:, 0].long()
+            sel = self._select_all_rules(vectors, indices)
+            # replace rules that don't apply with ones
+            qt[sel] = 1
+            temp_res = qt.prod(1)
+            res = torch.where(temp_res <= 1e-16, temp_res.add(1e-16), temp_res)
+            out = res / res.sum(1, keepdim=True)
+        else:
+            out = torch.zeros(len(X), self.k)
+            for i in range(len(X)):
+                sel = self._select_rules(X[i, 1:], int(X[i, 0].item()))
+                if len(sel) == 0:
+                    # raise RuntimeError("No rule especified for input No %d" % i)
+                    # print("Warning: No rule especified for input No %d" % i)
+                    out[i] = torch.ones((self.k,)) / self.k
+                else:
+                    mt = torch.index_select(ms, 0, torch.LongTensor(sel))
+                    qt = mt[:, :-1] + \
+                        mt[:, -1].view(-1, 1) * torch.ones_like(mt[:, :-1])
+                    res = qt.prod(0)
+                    # if torch.isnan(res).any():
+                    #     print(self._params)
+                    #     print(mt)
+                    #     print(qt)
+                    #     print(res)
+                    #     raise RuntimeError("NaN found in computation")
+                    if res.sum().item() <= 1e-16:
+                        res = res + 1e-16
+                        out[i] = res / res.sum()
+                    else:
+                        out[i] = res / res.sum()
         return out
 
     def clear_rmap(self):
@@ -84,8 +110,7 @@ class DSModelMultiQ(nn.Module):
         :return a bool tensor with shape (len(X), num_rules) with Trues for the rules that don't apply
         """
         if self._all_rules is None:
-            self._all_rules = torch.zeros(
-                0, self.n, dtype=torch.bool).to(device)
+            self._all_rules = torch.zeros(0, self.n, dtype=torch.bool).to(self.device)
         max_index = torch.max(indices)
         len_all_rules = len(self._all_rules)
         if max_index < len_all_rules:
@@ -94,7 +119,7 @@ class DSModelMultiQ(nn.Module):
             desired_len = max_index + 1
             padding = (0, 0, 0, desired_len-len_all_rules)
             self._all_rules = pad(self._all_rules, padding)
-        sel = torch.zeros(len(X), self.n, dtype=torch.bool).to(device)
+        sel = torch.zeros(len(X), self.n, dtype=torch.bool).to(self.device)
         X = X.cpu().data.numpy()
         for i, sample, index in zip(count(), X, indices):
             for j in range(self.n):
@@ -203,7 +228,7 @@ class DSModelMultiQ(nn.Module):
                 builder += "\n\n\t[%.3f] R%d: %s\n\t\t" % (r[3], r[1], r[2])
                 masses = r[4]
                 for j in range(len(masses)):
-                    builder += "\t%s: %.3f" % (str(classes[j])[:3] if j < len(classes) else "Unc", masses[j])
+                    builder += "\t%s: %.3f" % ( str(classes[j])[:3] if j < len(classes) else "Unc", masses[j])
         print(builder)
 
     def generate_statistic_single_rules(self, X, breaks=2, column_names=None, generated_columns=None):
@@ -398,7 +423,7 @@ class DSModelMultiQ(nn.Module):
         return len(self.active_rules)
 
     def get_rules_by_instance(self, x, order_by=0):
-        x = torch.Tensor(x).to(device)
+        x = torch.Tensor(x).to(self.device)
         sel = self._select_rules(x)
         rules = np.zeros((len(sel), self.k + 1))
         preds = []
