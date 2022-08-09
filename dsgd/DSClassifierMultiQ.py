@@ -37,9 +37,13 @@ class DSClassifierMultiQ(ClassifierMixin):
         self.max_iter = max_iter
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.device = device
-        if self.device.type == "cuda":  # With CUDA more workers may throw error
-            self.num_workers = 0
+        self.device = torch.device(device)
+        if self.device.type == "cuda":  
+            if not torch.cuda.is_available():
+                print("CUDA not available, using CPU")
+                self.device = torch.device("cpu")
+            else: # With CUDA more workers may throw error
+                self.num_workers = 0
         self.min_dJ = min_dloss
         self.balance_class_data = False
         self.debug_mode = debug_mode

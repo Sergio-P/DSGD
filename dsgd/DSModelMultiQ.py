@@ -73,15 +73,15 @@ class DSModelMultiQ(nn.Module):
             res = torch.where(temp_res <= 1e-16, temp_res.add(1e-16), temp_res)
             out = res / res.sum(1, keepdim=True)
         else:
-            out = torch.zeros(len(X), self.k)
+            out = torch.zeros(len(X), self.k).to(self.device)
             for i in range(len(X)):
                 sel = self._select_rules(X[i, 1:], int(X[i, 0].item()))
                 if len(sel) == 0:
                     # raise RuntimeError("No rule especified for input No %d" % i)
                     # print("Warning: No rule especified for input No %d" % i)
-                    out[i] = torch.ones((self.k,)) / self.k
+                    out[i] = torch.ones((self.k,).to(self.device)) / self.k
                 else:
-                    mt = torch.index_select(ms, 0, torch.LongTensor(sel))
+                    mt = torch.index_select(ms, 0, torch.LongTensor(sel).to(self.device))
                     qt = mt[:, :-1] + \
                         mt[:, -1].view(-1, 1) * torch.ones_like(mt[:, :-1])
                     res = qt.prod(0)
