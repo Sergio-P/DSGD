@@ -26,7 +26,7 @@ class DSClassifierMultiQ(ClassifierMixin):
         :param optim: [ adam | sgd ] Optimization Method
         :param lossfn: [ CE | MSE ] Loss function
         :param debug_mode: Enables debug in training (prtinting and output metrics)
-        :param device: [ cpu | cuda ] Device to use by pytorch
+        :param device: [ cpu | cuda | mps ] Device to use by pytorch
         :param force_precompute: Forces precomputation of rules, could use too much RAM
         """
         self.k = num_classes
@@ -38,11 +38,11 @@ class DSClassifierMultiQ(ClassifierMixin):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.device = torch.device(device)
-        if self.device.type == "cuda":  
-            if not torch.cuda.is_available():
-                print("CUDA not available, using CPU")
+        if self.device.type == "cuda" or self.device.type == "mps":  
+            if not torch.cuda.is_available() and not torch.backends.mps.is_available():
+                print("GPU acceleration is not available, using CPU")
                 self.device = torch.device("cpu")
-            else: # With CUDA more workers may throw error
+            else: # With GPU more workers may throw error
                 self.num_workers = 0
         self.min_dJ = min_dloss
         self.balance_class_data = False

@@ -71,7 +71,7 @@ and are the following:
   It speeds up the training but requires more memory.
 - `force_precompute` : Speeds up the training process but uses more memory,
   so use it carefully.
-- `device` : ( cpu | cuda ) Device to use for computations, cuda uses GPU
+- `device` : ( cpu | cuda | mps ) Device to use for computations, cuda and mps use GPU
   and usually is faster than cpu. To use cuda must have a compatible GPU
   and [CUDA](https://developer.nvidia.com/cuda-downloads) installed.
 

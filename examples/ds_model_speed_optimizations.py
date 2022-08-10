@@ -22,10 +22,12 @@ def main():
     y_test = data.iloc[cut:, -1].values
 
     training_times = []
+    EPOCHS = 15 # Force train by 15 epochs
+
     # Optimizations
 
     # Optimizations 1: Force precomputa
-    DSC = DSClassifierMultiQ(10, max_iter=100, lr=0.01, debug_mode=True,
+    DSC = DSClassifierMultiQ(10, max_iter=EPOCHS, min_iter=EPOCHS, lr=0.005, debug_mode=True,
                              lossfn="MSE", precompute_rules=True, batch_size=500,
                              force_precompute=True)
     losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1,
@@ -40,10 +42,10 @@ def main():
     training_times.append(dt)
 
     # Optimizations 2: Use CUDA
-    DSC = DSClassifierMultiQ(10, max_iter=100, lr=0.01, debug_mode=True,
+    DSC = DSClassifierMultiQ(10, max_iter=EPOCHS, min_iter=EPOCHS, lr=0.005, debug_mode=True,
                              lossfn="MSE", precompute_rules=True, batch_size=500,
                              force_precompute=False,
-                             device="cuda")
+                             device="mps")
     losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1,
                                 print_partial_time=True, print_time=True)
     y_pred = DSC.predict(X_test)
@@ -56,10 +58,10 @@ def main():
     training_times.append(dt)
 
     # Optimization 3: Use both
-    DSC = DSClassifierMultiQ(10, max_iter=100, lr=0.01, debug_mode=True,
+    DSC = DSClassifierMultiQ(10, max_iter=EPOCHS, min_iter=EPOCHS, lr=0.005, debug_mode=True,
                              lossfn="MSE", precompute_rules=True, batch_size=500,
                              force_precompute=True,
-                             device="cuda")
+                             device="mps")
     losses, epoch, dt = DSC.fit(X_train, y_train, add_single_rules=True, single_rules_breaks=1, print_every_epochs=1,
                                 print_partial_time=True, print_time=True)
     y_pred = DSC.predict(X_test)
@@ -72,7 +74,7 @@ def main():
     training_times.append(dt)
 
     # Non optimized
-    DSC = DSClassifierMultiQ(10, max_iter=100, lr=0.01, debug_mode=True,
+    DSC = DSClassifierMultiQ(10, max_iter=EPOCHS, min_iter=EPOCHS, lr=0.005, debug_mode=True,
                              lossfn="MSE", precompute_rules=True, batch_size=500,
                              force_precompute=False,
                              device="cpu")
