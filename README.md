@@ -10,8 +10,8 @@ This repository contains 3 implementations of the classifier:
 - `DSClassifier` for binary classification problems
 - `DSClassifierMulti` for multi-class classification problems
 - `DSClassifierMultiQ` for multi-class classification problems 
-that also includes the commonality transformation improvement 
-which makes computations faster
+  that also includes the commonality transformation improvement 
+  which makes computations faster
 
 We always recommend using `DSClassifierMultiQ` since it is the 
 most stable and fastest implementation. Multi-class implementations
@@ -26,7 +26,7 @@ can handle binary problems as well.
 ### Import the module
 
     from dsgd import DSClassifierMultiQ
-    
+
 ### Read the data
 
 The data can be read using `pandas`, `numpy` or other libraries
@@ -39,13 +39,12 @@ classes
 
     y = data["class"].values
     X = data.drop("class").values
-    
+
 Ensure that feature vectors (X) and their classes (y) are a numpy 
 matrix and a numpy array, respectively. (In the example we use the
 property `DataFrame.values` to convert a pandas dataframe to numpy 
 elements). And also ensure that classes are integers from `0` to
 `num_classes - 1`. Strings are not permitted as class values.
-
 
 ### Create the model
 
@@ -66,10 +65,15 @@ and are the following:
 - `lossfn` : ( CE | MSE ) Loss function
 - `debug_mode` : Enables debug in training (prints and outputs metrics)
 - `batch_size` : For large datasets, the number of records to be 
-processed together (batch)
+  processed together (batch)
 - `precompute_rules` : Whether to store the result of the rules 
-computations for each record instead of computing every time. 
-It speeds up the training but requires more memory.
+  computations for each record instead of computing every time. 
+  It speeds up the training but requires more memory.
+- `force_precompute` : Speeds up the training process but uses more memory,
+  so use it carefully.
+- `device` : ( cpu | cuda | mps ) Device to use for computations, cuda and mps use GPU
+  and usually is faster than cpu. To use cuda must have a compatible GPU
+  and [CUDA](https://developer.nvidia.com/cuda-downloads) installed.
 
 ### Rule definition
 
@@ -99,14 +103,14 @@ are explained below.
 
     DSC.model.generate_statistic_single_rules(X, breaks=3, 
                                  column_names=names)
-                             
+
 Given a sample of feature vectors (usually the same using for training)
 and a number of breaks `n`, the model generates simple one-attribute 
 rules that separate each variable into `n+1` equal-number groups. Columns 
 names are optional and they are only used to generate the descriptions.
 
     DSC.model.generate_mult_pair_rules(X, column_names=names)
-                             
+
 Given a sample of feature vectors (usually the same using for training).
 It creates a rule for each pair of attributes indicating whether they 
 are both below their means, above their means, or one above and the 
@@ -115,7 +119,7 @@ other below.
 ### Training
 
     DSC.fit(X,y)
-   
+
 The method `fit` given a set of feature vectors `X` and their 
 corresponding classes `y`, performs all the training of the model
 according to the configuration and the rules defined. When this method
@@ -135,7 +139,7 @@ time taken in every step.
 
 For predicting a set of new feature vectors `X_new`, the model provides
 the method `predict` which returns an array with the predicted classes
-for each feature vector (in the same notation as used in the fit method). 
+for each feature vector (in the same notation as used in the fit method).
 
     y_score = DSC.predict_proba(X_new)
 
@@ -163,14 +167,13 @@ to save and load trained models from disk.
     DSC.model.save_rules_bin("my_trained_model.dsb")
     # ...
     DSC.model.load_rules_bin("my_trained_model.dsb")
-    
+
 Currently the model only saves the rules (lambdas and adjusted values). 
 However, the other configurations must be set every time. Note that the 
 model is created when invoking to `load_rules_bin` so we have already
 defined its configuration.
 
-
 ### Full example
 
 For a full and simple example please refer to the [Iris example](https://github.com/Sergio-P/DSGD/blob/master/examples/ds_model_iris_3.py). 
-Uncomment and comment lines to see other features. 
+Uncomment and comment lines to see other features.

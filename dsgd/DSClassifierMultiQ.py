@@ -7,7 +7,7 @@ from sklearn.base import ClassifierMixin
 from torch.autograd import Variable
 from torch.utils.data.sampler import WeightedRandomSampler
 
-from dsgd.DSModelMultiQ import DSModelMultiQ
+from .DSModelMultiQ import DSModelMultiQ
 
 
 class DSClassifierMultiQ(ClassifierMixin):
@@ -16,7 +16,8 @@ class DSClassifierMultiQ(ClassifierMixin):
     """
 
     def __init__(self, num_classes, lr=0.005, max_iter=200, min_iter=2, min_dloss=0.0001, optim="adam", lossfn="MSE",
-                 debug_mode=False, step_debug_mode=False, batch_size=4000, num_workers=1, precompute_rules=False):
+                 debug_mode=False, step_debug_mode=False, batch_size=4000, num_workers=1,
+                 precompute_rules=False, device="cpu", force_precompute=False):
         """
         Creates the classifier and the DSModel (accesible in attribute model)
         :param lr: Learning rate
@@ -25,6 +26,8 @@ class DSClassifierMultiQ(ClassifierMixin):
         :param optim: [ adam | sgd ] Optimization Method
         :param lossfn: [ CE | MSE ] Loss function
         :param debug_mode: Enables debug in training (prtinting and output metrics)
+        :param device: [ cpu | cuda | mps ] Device to use by pytorch
+        :param force_precompute: Forces precomputation of rules, could use too much RAM
         """
         self.k = num_classes
         self.lr = lr
@@ -34,11 +37,19 @@ class DSClassifierMultiQ(ClassifierMixin):
         self.max_iter = max_iter
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.device = torch.device(device)
+        if self.device.type == "cuda" or self.device.type == "mps":  
+            if not torch.cuda.is_available() and not torch.backends.mps.is_available():
+                print("GPU acceleration is not available, using CPU")
+                self.device = torch.device("cpu")
+            else: # With GPU more workers may throw error
+                self.num_workers = 0
         self.min_dJ = min_dloss
         self.balance_class_data = False
         self.debug_mode = debug_mode
         self.step_debug_mode = step_debug_mode
-        self.model = DSModelMultiQ(num_classes, precompute_rules=precompute_rules)
+        self.model = DSModelMultiQ(num_classes, precompute_rules=precompute_rules,
+                                    device=self.device, force_precompute=force_precompute).to(self.device)
         self.classes_ = [k for k in range(self.k)]
 
     def fit(self, X, y, add_single_rules=False, single_rules_breaks=2, add_mult_rules=False, column_names=None, **kwargs):
@@ -95,11 +106,11 @@ class DSClassifierMultiQ(ClassifierMixin):
         self.model.train()
         self.model.clear_rmap()
 
-        Xt = Variable(torch.Tensor(X))
+        Xt = Variable(torch.Tensor(X).to(self.device))
         if self.lossfn == "CE":
-            yt = Variable(torch.LongTensor(y))
+            yt = Variable(torch.LongTensor(y).to(self.device))
         else:
-            yt = torch.nn.functional.one_hot(torch.LongTensor(y), self.k).float()
+            yt = torch.nn.functional.one_hot(torch.LongTensor(y).to(self.device), self.k).float()
 
         dataset = torch.utils.data.TensorDataset(Xt, yt)
         N = len(dataset)
@@ -148,11 +159,11 @@ class DSClassifierMultiQ(ClassifierMixin):
 
         self.model.train()
         self.model.clear_rmap()
-        Xt = Variable(torch.Tensor(X))
+        Xt = Variable(torch.Tensor(X).to(self.device))
         if self.lossfn == "CE":
-            yt = Variable(torch.LongTensor(y))
+            yt = Variable(torch.LongTensor(y).to(self.device))
         else:
-            yt = torch.nn.functional.one_hot(torch.LongTensor(y), self.k).float()
+            yt = torch.nn.functional.one_hot(torch.LongTensor(y).to(self.device), self.k).float()
 
         dataset = torch.utils.data.TensorDataset(Xt, yt)
         N = len(dataset)
@@ -254,11 +265,11 @@ class DSClassifierMultiQ(ClassifierMixin):
 
         self.model.train()
         self.model.clear_rmap()
-        Xt = Variable(torch.Tensor(X))
+        Xt = Variable(torch.Tensor(X).to(self.device))
         if self.lossfn == "CE":
-            yt = Variable(torch.LongTensor(y))
+            yt = Variable(torch.LongTensor(y).to(self.device))
         else:
-            yt = torch.nn.functional.one_hot(torch.LongTensor(y), self.k).float()
+            yt = torch.nn.functional.one_hot(torch.LongTensor(y).to(self.device), self.k).float()
 
         dataset = torch.utils.data.TensorDataset(Xt, yt)
         N = len(dataset)
@@ -354,12 +365,12 @@ class DSClassifierMultiQ(ClassifierMixin):
         X = np.insert(X, 0, values=np.arange(0, len(X)), axis=1)
 
         with torch.no_grad():
-            Xt = torch.Tensor(X)
+            Xt = torch.Tensor(X).to(self.device)
             if one_hot:
                 return self.model(Xt).numpy()
             else:
                 _, yt_pred = torch.max(self.model(Xt), 1)
-                yt_pred = yt_pred.numpy()
+                yt_pred = yt_pred.cpu().numpy()
                 return yt_pred
 
     def predict_proba(self, X):
@@ -388,7 +399,7 @@ class DSClassifierMultiQ(ClassifierMixin):
             cols.append("mass_class_" + str(i+1))
         # builder += " Uncertainty:\t%.3f\n\n" % pred[-1]
         cols.append("uncertainty")
-        
+
         df_rls = pd.DataFrame(rls)
         prds = [str(p) for p in prds]
         df_rls.insert(0, "rule", prds)
